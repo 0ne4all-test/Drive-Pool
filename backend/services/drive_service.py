@@ -1,9 +1,7 @@
-import glob
 import io
 import json
 import logging
 import os
-import re
 import time
 
 logger = logging.getLogger(__name__)
@@ -24,30 +22,7 @@ from services.auth_service import decrypt_token
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 PROFILE_FOLDER_NAME = "_DrivePool_"
-
-
-def get_credentials_path(account_index: int) -> str:
-    return os.path.join(config.CONFIG_DIR, f"credentials_{account_index}.json")
-
-
-def discover_account_indices() -> list[int]:
-    pattern = os.path.join(config.CONFIG_DIR, "credentials_*.json")
-    files = glob.glob(pattern)
-    indices = []
-    for f in files:
-        match = re.search(r"credentials_(\d+)\.json$", f)
-        if match:
-            indices.append(int(match.group(1)))
-    return sorted(indices)
-
-
-def sync_accounts(db: Session) -> None:
-    indices = discover_account_indices()
-    for idx in indices:
-        account = db.query(DriveAccount).filter(DriveAccount.account_index == idx).first()
-        if not account:
-            db.add(DriveAccount(account_index=idx, is_connected=False))
-    db.commit()
+CREDENTIALS_PATH = os.path.join(config.CONFIG_DIR, "credentials.json")
 
 
 def _retry_on_rate_limit(fn, *args, **kwargs):
@@ -65,9 +40,8 @@ def _retry_on_rate_limit(fn, *args, **kwargs):
 def build_service(account: DriveAccount):
     if not account.refresh_token:
         raise ValueError(f"Account {account.account_index} is not connected (no refresh token)")
-    creds_path = get_credentials_path(account.account_index)
     refresh_token = decrypt_token(account.refresh_token)
-    with open(creds_path) as f:
+    with open(CREDENTIALS_PATH) as f:
         client_config = json.load(f)
     web = client_config.get("web") or client_config.get("installed")
     creds = Credentials(
@@ -81,9 +55,8 @@ def build_service(account: DriveAccount):
     return build("drive", "v3", credentials=creds)
 
 
-def get_oauth_flow(account_index: int, redirect_uri: str) -> Flow:
-    creds_path = get_credentials_path(account_index)
-    flow = Flow.from_client_secrets_file(creds_path, scopes=SCOPES, redirect_uri=redirect_uri)
+def get_oauth_flow(redirect_uri: str) -> Flow:
+    flow = Flow.from_client_secrets_file(CREDENTIALS_PATH, scopes=SCOPES, redirect_uri=redirect_uri)
     return flow
 
 

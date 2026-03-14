@@ -240,17 +240,17 @@ cd Drive-Pool`}
               <StepHeader num="02" color="text-blue-400" accent="border-blue-500/40" title="Create Google Cloud Credentials" />
               <div className="space-y-5">
                 <p className="text-sm leading-relaxed text-dp-text2">
-                  Each Google Drive account needs its own OAuth credentials. Repeat this entire process for every account you want to add.
+                  You only need <strong className="text-dp-text">one Google Cloud project</strong> and one credentials file — no matter how many Drive accounts you want to add. All accounts authenticate through the same OAuth client.
                 </p>
                 <NumberedList items={[
                   <>Go to <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" className="text-orange-400 underline underline-offset-2">console.cloud.google.com</a> and create a <strong className="text-dp-text">new project</strong>.</>,
                   <>Navigate to <strong className="text-dp-text">APIs &amp; Services → Library</strong>, search for <strong className="text-dp-text">Google Drive API</strong>, and enable it.</>,
-                  <>Go to <strong className="text-dp-text">APIs &amp; Services → OAuth consent screen</strong>. Choose <strong className="text-dp-text">External</strong>, fill in any app name, and add your own Google account as a <strong className="text-dp-text">test user</strong>.</>,
+                  <>Go to <strong className="text-dp-text">APIs &amp; Services → OAuth consent screen</strong>. Choose <strong className="text-dp-text">External</strong>, fill in any app name, and add <strong className="text-dp-text">all Google accounts you want to connect</strong> as test users (one email per line).</>,
                   <>Go to <strong className="text-dp-text">Credentials → Create Credentials → OAuth client ID</strong>. Choose <strong className="text-dp-text">Desktop app</strong> as the application type.</>,
                   <>Download the JSON file. You&apos;ll place it in the next step.</>,
                 ]} />
-                <Note type="warn">
-                  Create a separate Google Cloud project for each Drive account. Using the same project for multiple accounts causes OAuth conflicts.
+                <Note type="tip">
+                  Adding all your Google accounts as test users on the OAuth consent screen gives them long-lived refresh tokens — no 7-day expiry. You won&apos;t need to reconnect periodically.
                 </Note>
               </div>
             </section>
@@ -260,16 +260,14 @@ cd Drive-Pool`}
               <StepHeader num="03" color="text-emerald-400" accent="border-emerald-500/40" title="Place Credentials in /config" />
               <div className="space-y-4">
                 <p className="text-sm leading-relaxed text-dp-text2">
-                  Place all downloaded credential files in the <Code>config/</Code> folder at the project root. DrivePool auto-discovers them by number on startup.
+                  Place the downloaded credentials file in the <Code>config/</Code> folder at the project root, named exactly <Code>credentials.json</Code>.
                 </p>
-                <Block label="config/ folder — example with 3 accounts">
+                <Block label="config/ folder">
 {`config/
-├── credentials_1.json   ← Account #1
-├── credentials_2.json   ← Account #2
-└── credentials_3.json   ← Account #3`}
+└── credentials.json   ← your single OAuth client file`}
                 </Block>
-                <Note type="tip">
-                  Adding more accounts later is just as simple — drop in another <Code>credentials_N.json</Code> and restart the backend.
+                <Note type="info">
+                  This one file is reused for every Drive account you connect. Each account gets its own encrypted refresh token stored in the database.
                 </Note>
               </div>
             </section>
@@ -313,7 +311,7 @@ cd Drive-Pool`}
               <StepHeader num="05" color="text-sky-400" accent="border-sky-500/40" title="Start the Backend" />
               <div className="space-y-4">
                 <p className="text-sm leading-relaxed text-dp-text2">
-                  The backend is a FastAPI app served by Uvicorn. On startup it creates the database tables, runs migrations, discovers your credential files, and syncs file metadata from all connected Drive accounts.
+                  The backend is a FastAPI app served by Uvicorn. On startup it creates the database tables, runs migrations, and syncs file metadata from all connected Drive accounts.
                 </p>
                 <Block label="From the project root">
 {`uvicorn backend.main:app --reload --port 8000`}
@@ -344,17 +342,17 @@ npm run dev`}
 
             {/* ── Step 07 ── */}
             <section id="connect">
-              <StepHeader num="07" color="text-yellow-400" accent="border-yellow-500/40" title="Connect Your Drive Accounts" />
+              <StepHeader num="07" color="text-yellow-400" accent="border-yellow-500/40" title="Connect Your First Drive Account" />
               <div className="space-y-5">
                 <p className="text-sm leading-relaxed text-dp-text2">
                   Each account must be authorized via Google OAuth once before DrivePool can access it.
                 </p>
                 <NumberedList items={[
                   <>Navigate to <span className="font-mono text-orange-400">http://localhost:3000/login</span> and enter your PIN.</>,
-                  <>Click <strong className="text-dp-text">Settings</strong> in the left sidebar. You&apos;ll see one card per credentials file.</>,
-                  <>Click <strong className="text-dp-text">Connect Account</strong> on each disconnected card. You&apos;ll be redirected to Google&apos;s OAuth consent screen.</>,
-                  <>Sign in with the matching Google account and grant Drive access. You&apos;ll be redirected back automatically.</>,
-                  <>The card turns green and shows the account&apos;s storage quota. You&apos;re ready to upload.</>,
+                  <>Click <strong className="text-dp-text">Settings</strong> in the left sidebar.</>,
+                  <>Click the <strong className="text-dp-text">Connect another account</strong> button in the top-right of the Settings page.</>,
+                  <>You&apos;ll be redirected to Google&apos;s OAuth consent screen. Sign in with one of your Google accounts and grant Drive access.</>,
+                  <>You&apos;ll be redirected back to Settings. The new account card appears with its storage quota.</>,
                 ]} />
                 <Note type="info">
                   OAuth refresh tokens are encrypted with Fernet before being stored in the database — they are never saved in plain text.
@@ -364,18 +362,20 @@ npm run dev`}
 
             {/* ── Step 08 ── */}
             <section id="scale">
-              <StepHeader num="08" color="text-emerald-400" accent="border-emerald-500/40" title="Add More Accounts Later" />
+              <StepHeader num="08" color="text-emerald-400" accent="border-emerald-500/40" title="Add More Accounts" />
               <div className="space-y-4">
                 <p className="text-sm leading-relaxed text-dp-text2">
-                  Expanding your storage pool is a one-minute operation. No config changes needed.
+                  Adding another Drive account takes seconds — no file changes, no restart needed.
                 </p>
                 <NumberedList items={[
-                  "Create a new Google Cloud project and repeat Step 02.",
-                  <>Save the credentials JSON as <Code>credentials_N.json</Code> in the <Code>config/</Code> folder (next number in sequence).</>,
-                  "Restart the backend — the new account appears in Settings as Disconnected.",
-                  "Click Connect Account and authorize via OAuth.",
+                  <>Go to <strong className="text-dp-text">Settings</strong> and click <strong className="text-dp-text">Connect another account</strong>.</>,
+                  "Sign in with a different Google account on the OAuth screen.",
+                  "You're back in Settings — the new account card is live with its own quota bar.",
                   "Done — your pool just grew by 15 GB.",
                 ]} />
+                <Note type="tip">
+                  Make sure each Google account you want to add is listed as a test user on the OAuth consent screen (Step 02). Otherwise Google will block the sign-in.
+                </Note>
                 <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5 text-center">
                   <p className="text-2xl font-bold text-dp-text">N × 15 GB</p>
                   <p className="mt-1 text-xs text-dp-text2">No hard limit on accounts. 10 accounts = 150 GB free.</p>
@@ -413,7 +413,7 @@ npm run dev`}
                   },
                   {
                     label: "Settings", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20",
-                    items: ["Total pool summary", "Per-account quota bars", "Connect / Disconnect accounts", "Profile: display name, bio, avatar"],
+                    items: ["Total pool summary", "Per-account quota bars", "Connect another account (OAuth)", "Disconnect or remove accounts", "Profile: display name, bio, avatar"],
                   },
                 ].map((page) => (
                   <div key={page.label} className={`rounded-2xl border ${page.border} bg-dp-s1 p-5`}>
@@ -445,7 +445,7 @@ npm run dev`}
                   },
                   {
                     q: "How many accounts can I add?",
-                    a: "There is no limit. Each account adds its full storage quota to the pool. 10 free accounts = 150 GB.",
+                    a: "There is no limit. Click \"Connect another account\" in Settings for each additional Google account. Each one adds its full storage quota to the pool. 10 free accounts = 150 GB.",
                   },
                   {
                     q: "What happens if an account is full?",
@@ -490,7 +490,7 @@ npm run dev`}
                   },
                   {
                     q: "OAuth callback returns an error",
-                    a: "Check that the authorized redirect URI in Google Cloud Console is exactly http://localhost:8000/api/auth/callback. Also confirm your account is added as a test user on the consent screen.",
+                    a: "Check that the authorized redirect URI in Google Cloud Console is exactly http://localhost:8000/api/auth/callback. Also confirm the Google account you're signing in with is added as a test user on the OAuth consent screen.",
                   },
                   {
                     q: "Files don't appear after uploading directly in Drive",
@@ -498,7 +498,7 @@ npm run dev`}
                   },
                   {
                     q: "Upload fails with 503",
-                    a: "All connected accounts are full. Add another Google account (Step 08).",
+                    a: "All connected accounts are full. Go to Settings, click \"Connect another account\", and authorize a new Google account.",
                   },
                   {
                     q: "Account shows Disconnected after restart",

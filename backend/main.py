@@ -9,7 +9,7 @@ from database import SessionLocal, engine
 from models.models import Base
 from routes import auth, accounts, files
 from routes import profile as profile_router
-from services.drive_service import sync_accounts, sync_files_from_drives
+from services.drive_service import sync_files_from_drives
 
 
 def run_migrations():
@@ -30,7 +30,6 @@ async def lifespan(app: FastAPI):
     run_migrations()
     db = SessionLocal()
     try:
-        sync_accounts(db)
         sync_files_from_drives(db)
     finally:
         db.close()
@@ -51,3 +50,8 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(accounts.router, prefix="/api")
 app.include_router(files.router, prefix="/api")
 app.include_router(profile_router.router, prefix="/api")
+
+
+@app.get("/active")
+def active():
+    return {"status": "active"}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useStorage } from "@/hooks/useStorage";
 
 function formatBytes(bytes: number): string {
@@ -10,6 +11,7 @@ function formatBytes(bytes: number): string {
 
 export default function SettingsPage() {
   const { accounts, refreshStorage } = useStorage();
+  const [connecting, setConnecting] = useState(false);
 
   const totalUsed = accounts.reduce((s, a) => s + a.used, 0);
   const totalLimit = accounts.reduce((s, a) => s + a.limit, 0);
@@ -26,14 +28,41 @@ export default function SettingsPage() {
     window.location.href = data.auth_url;
   }
 
+  async function handleConnectNew() {
+    if (connecting) return;
+    setConnecting(true);
+    const res = await fetch("/api/auth/oauth/new", { credentials: "include" });
+    const data = await res.json();
+    window.location.href = data.auth_url;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-semibold text-dp-text">Settings</h1>
-        <p className="mt-1 text-sm text-dp-text2">
-          {connectedCount} of {accounts.length} accounts connected
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold text-dp-text">Settings</h1>
+          <p className="mt-1 text-sm text-dp-text2">
+            {connectedCount} of {accounts.length} accounts connected
+          </p>
+        </div>
+        <button
+          onClick={handleConnectNew}
+          disabled={connecting}
+          className="flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-orange-400 disabled:opacity-60"
+        >
+          {connecting ? (
+            <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+            </svg>
+          ) : (
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          )}
+          {connecting ? "Redirecting…" : "Connect another account"}
+        </button>
       </div>
 
       {/* Storage pool overview */}
@@ -124,12 +153,23 @@ export default function SettingsPage() {
                     Disconnect
                   </button>
                 ) : (
-                  <button
-                    onClick={() => handleConnect(account.account_index)}
-                    className="w-full rounded-lg bg-orange-500/10 py-2 text-xs font-medium text-orange-400 transition hover:bg-orange-500/20"
-                  >
-                    Connect Account
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleConnect(account.account_index)}
+                      className="flex-1 rounded-lg bg-orange-500/10 py-2 text-xs font-medium text-orange-400 transition hover:bg-orange-500/20"
+                    >
+                      Connect
+                    </button>
+                    <button
+                      onClick={() => handleDisconnect(account.account_index)}
+                      className="rounded-lg border border-dp-border px-3 py-2 text-xs text-dp-text3 transition hover:border-red-500/40 hover:text-red-400"
+                      title="Remove account"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
                 )}
               </div>
             );

@@ -44,10 +44,44 @@ def logout(response: Response):
     return {"ok": True}
 
 
+@router.get("/oauth/new")
+def get_new_oauth_url(
+    request: Request,
+    db: Session = Depends(get_db),
+    _=Depends(verify_token),
+):
+    # Remove any leftover email-less disconnected placeholders from previous attempts
+    db.query(DriveAccount).filter(
+        DriveAccount.is_connected == False,
+        DriveAccount.email == None,
+        DriveAccount.refresh_token == None,
+    ).delete()
+    db.commit()
+
+    max_account = db.query(DriveAccount).order_by(DriveAccount.account_index.desc()).first()
+    new_index = (max_account.account_index + 1) if max_account else 1
+
+    placeholder = DriveAccount(account_index=new_index, is_connected=False)
+    db.add(placeholder)
+    db.commit()
+
+    redirect_uri = str(request.base_url) + "api/auth/callback"
+    flow = get_oauth_flow(redirect_uri)
+    auth_url, _ = flow.authorization_url(
+        access_type="offline",
+        include_granted_scopes="true",
+        prompt="consent",
+        state=str(new_index),
+    )
+    if flow.code_verifier:
+        _pending_verifiers[new_index] = flow.code_verifier
+    return {"auth_url": auth_url}
+
+
 @router.get("/oauth/{account_index}")
 def get_oauth_url(account_index: int, request: Request, _=Depends(verify_token)):
     redirect_uri = str(request.base_url) + "api/auth/callback"
-    flow = get_oauth_flow(account_index, redirect_uri)
+    flow = get_oauth_flow(redirect_uri)
     auth_url, _ = flow.authorization_url(
         access_type="offline",
         include_granted_scopes="true",
@@ -69,7 +103,7 @@ def oauth_callback(
 ):
     account_index = int(state)
     redirect_uri = str(request.base_url) + "api/auth/callback"
-    flow = get_oauth_flow(account_index, redirect_uri)
+    flow = get_oauth_flow(redirect_uri)
     code_verifier = _pending_verifiers.pop(account_index, None)
     if code_verifier:
         flow.code_verifier = code_verifier
@@ -94,5 +128,5 @@ def oauth_callback(
 
     return Response(
         status_code=302,
-        headers={"Location": f"{config.FRONTEND_URL}/dashboard"},
+        headers={"Location": f"{config.FRONTEND_URL}/dashboard/settings"},
     )
