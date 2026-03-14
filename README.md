@@ -1,68 +1,103 @@
-# DriveCloud
+# DrivePool
 
-Unified dashboard that aggregates N Google Drive accounts into a single storage pool. Files are automatically routed to the account with the most available space on every upload.
+Self-hosted unified dashboard that aggregates multiple Google Drive accounts into a single storage pool. Every upload automatically routes to the account with the most available space — no manual management, no paid tier.
 
-## Structure
+> **Runs entirely on your local machine. Your files stay in your own Google Drive accounts.**
 
-```
-DriveCloud/
-├── backend/          FastAPI + SQLite
-├── frontend/         Next.js (App Router) + Tailwind CSS
-└── config/           Google OAuth credentials (not committed)
-```
+---
 
-## Setup
+## Why DrivePool?
 
-### 1 — Google OAuth credentials
+Google gives every account **15 GB free**. DrivePool lets you combine as many accounts as you want into one unified interface — effectively giving you N × 15 GB of free cloud storage. Add more accounts at any time without changing any configuration.
 
-For each Google account, create an OAuth 2.0 client in [Google Cloud Console](https://console.cloud.google.com/) (type: **Web application**) and add `http://localhost:8000/api/auth/callback` as an authorized redirect URI.
-
-Download the JSON and save it as `config/credentials_1.json`, `config/credentials_2.json`, etc. The number of accounts is detected automatically.
-
-### 2 — Backend environment
-
-```bash
-cd backend
-cp .env.example .env
-uv run python scripts/generate_secrets.py
-```
-
-Paste the output into `backend/.env`.
-
-### 3 — Run the backend
-
-```bash
-cd backend
-uv run uvicorn main:app --reload --app-dir ..
-```
-
-Or without uv:
-
-```bash
-pip install -r backend/requirements.txt
-uvicorn backend.main:app --reload
-```
-
-API docs available at `http://localhost:8000/docs`.
-
-### 4 — Run the frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Dashboard at `http://localhost:3000`.
-
-### 5 — Connect accounts
-
-Log in with your PIN, then click **Connect** on each account card to complete the Google OAuth flow.
+---
 
 ## Features
 
-- Dynamic account count — add or remove `credentials_*.json` files and restart the backend
-- Least Used Space upload routing — files go to the account with the most free space
-- Thumbnails proxied from Drive (no full-file fetch)
-- Inline file rename, download, and delete
-- PIN-protected with bcrypt + httponly JWT cookie
+- **Unified storage pool** — one dashboard for all your Drive accounts
+- **Smart upload routing** — Least-Used-Space strategy picks the best account on every upload
+- **Folder navigation** — full hierarchy, breadcrumbs, grid & list views, search, filters
+- **Drag-to-folder** — drag a file and drop it into any folder from a slide-in panel
+- **Shared with me** — browse and download files others have shared with your accounts
+- **Trash management** — delete goes to Drive trash; restore or permanently delete anytime
+- **Analytics** — storage by account, file type charts, weekly upload activity
+- **Profile** — display name, bio, avatar stored in your own Drive
+- **Secure** — bcrypt-hashed PIN, httponly JWT cookie, OAuth tokens encrypted at rest (Fernet)
+- **No .env needed** — secrets are stored directly in the local SQLite database
+- **Dark / light theme**
+- **100% open source, $0 cost**
+
+---
+
+## Quick Start
+
+**Prerequisites:** Python 3.10+, Node.js 18+, at least one Google account
+
+### 1. Clone
+
+```bash
+git clone https://github.com/saimon4u/Drive-Pool.git
+cd DrivePool
+```
+
+### 2. Google OAuth credentials
+
+For each Drive account you want to add:
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com) → create a new project
+2. Enable **Google Drive API**
+3. Create an OAuth consent screen (External, add yourself as test user)
+4. Create credentials → **OAuth client ID → Desktop app** → download JSON
+5. Save as `config/credentials_1.json`, `config/credentials_2.json`, etc.
+
+### 3. Install & set up
+
+```bash
+pip install -r backend/requirements.txt
+python backend/scripts/generate_secrets.py
+```
+
+Enter a PIN when prompted — your PIN hash, JWT secret, and encryption key are written directly to `backend/drivepool.db`. No `.env` file needed.
+
+### 4. Start the servers
+
+```bash
+# Terminal 1 — backend
+uvicorn backend.main:app --reload
+
+# Terminal 2 — frontend
+cd frontend && npm install && npm run dev
+```
+
+### 5. Connect your accounts
+
+Open [http://localhost:3000](http://localhost:3000), log in with your PIN, navigate to **Settings**, and click **Connect** on each account.
+
+That's it — start uploading at [http://localhost:3000/dashboard](http://localhost:3000/dashboard).
+
+---
+
+## Adding more storage
+
+Drop another `credentials_N.json` into `config/`, restart the backend, and connect the new account in Settings. Each free Google account adds 15 GB to your pool.
+
+---
+
+## Tech stack
+
+| Layer | Tech |
+|-------|------|
+| Backend | Python · FastAPI · SQLite · Google Drive API v3 |
+| Frontend | Next.js (App Router) · Tailwind CSS |
+
+---
+
+## Full setup guide
+
+See [http://localhost:3000/docs](http://localhost:3000/docs) once the app is running, or read `frontend/app/docs/page.tsx` directly.
+
+---
+
+## License
+
+MIT

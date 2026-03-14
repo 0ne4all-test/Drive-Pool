@@ -164,12 +164,153 @@ function FileTypeIcon({ mimeType, size = 40 }: { mimeType: string | null; size?:
   );
 }
 
+function PreviewModal({ file, onClose }: { file: FileItem; onClose: () => void }) {
+  const mime = file.mime_type ?? "";
+  const isGoogleWorkspace = mime.startsWith("application/vnd.google-apps.") && mime !== "application/vnd.google-apps.folder";
+  const src = `/api/files/${file.id}/view`;
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) { if (e.key === "Escape") onClose(); }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  function renderContent() {
+    if (isGoogleWorkspace) {
+      return (
+        <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+          <svg className="h-12 w-12 text-dp-text3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+          </svg>
+          <div>
+            <p className="text-sm font-medium text-dp-text">Google Workspace file</p>
+            <p className="mt-1 text-xs text-dp-text3">This file type can only be previewed in Google Drive.</p>
+          </div>
+          <a
+            href={`https://drive.google.com/file/d/${file.drive_file_id}/view`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-400"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+            </svg>
+            Open in Google Drive
+          </a>
+        </div>
+      );
+    }
+    if (mime.startsWith("image/")) {
+      return (
+        <div className="flex items-center justify-center p-4">
+          <img src={src} alt={file.file_name} className="max-h-[72vh] max-w-full rounded-xl object-contain shadow-xl" />
+        </div>
+      );
+    }
+    if (mime.startsWith("video/")) {
+      return (
+        <div className="flex items-center justify-center p-4">
+          <video src={src} controls className="max-h-[72vh] max-w-full rounded-xl shadow-xl" />
+        </div>
+      );
+    }
+    if (mime.startsWith("audio/")) {
+      return (
+        <div className="flex items-center justify-center p-16">
+          <audio src={src} controls className="w-full max-w-md" />
+        </div>
+      );
+    }
+    if (mime.includes("pdf") || mime.startsWith("text/")) {
+      return (
+        <iframe
+          src={src}
+          title={file.file_name}
+          className="h-[72vh] w-full rounded-b-2xl border-0"
+        />
+      );
+    }
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+        <svg className="h-12 w-12 text-dp-text3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+        </svg>
+        <div>
+          <p className="text-sm font-medium text-dp-text">No preview available</p>
+          <p className="mt-1 text-xs text-dp-text3">This file type cannot be previewed in the browser.</p>
+        </div>
+        <a
+          href={`/api/files/${file.id}/download`}
+          download={file.file_name}
+          className="flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-400"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          Download instead
+        </a>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative flex w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-dp-border bg-dp-s1 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-dp-border px-5 py-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <svg className="h-4 w-4 flex-shrink-0 text-dp-text3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+            <p className="truncate text-sm font-medium text-dp-text">{file.file_name}</p>
+            <span className="flex-shrink-0 rounded-md border border-dp-border px-1.5 py-0.5 text-[10px] text-dp-text3">#{file.account_index}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {!isGoogleWorkspace && (
+              <a
+                href={`/api/files/${file.id}/download`}
+                download={file.file_name}
+                className="flex items-center gap-1.5 rounded-lg border border-dp-border px-3 py-1.5 text-xs text-dp-text2 transition hover:bg-dp-hover hover:text-dp-text"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Download
+              </a>
+            )}
+            <button
+              onClick={onClose}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-dp-text3 transition hover:bg-dp-hover hover:text-dp-text"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        {/* Content */}
+        <div className="overflow-auto bg-dp-bg">
+          {renderContent()}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ActionsMenu({
   file,
   onRename,
   onDownload,
   onDelete,
   onShare,
+  onPreview,
   inFolder,
   onMoveToRoot,
 }: {
@@ -178,6 +319,7 @@ function ActionsMenu({
   onDownload: () => void;
   onDelete: () => void;
   onShare: () => void;
+  onPreview: () => void;
   inFolder?: boolean;
   onMoveToRoot?: () => void;
 }) {
@@ -219,6 +361,18 @@ function ActionsMenu({
 
       {open && (
         <div className="absolute right-0 bottom-full mb-1 z-30 min-w-[160px] rounded-xl border border-dp-border bg-dp-s1 py-1 shadow-xl">
+          {!isFolder && (
+            <button
+              onClick={() => { onPreview(); setOpen(false); }}
+              className="flex w-full items-center gap-2.5 px-3 py-2 text-xs text-dp-text2 transition hover:bg-dp-hover hover:text-dp-text"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              </svg>
+              Open
+            </button>
+          )}
           <button
             onClick={() => { onRename(); setOpen(false); }}
             className="flex w-full items-center gap-2.5 px-3 py-2 text-xs text-dp-text2 transition hover:bg-dp-hover hover:text-dp-text"
@@ -295,6 +449,7 @@ function GridCard({
   onMoveToRoot,
   onDragStartFile,
   onShare,
+  onPreview,
 }: {
   file: FileItem;
   onOpen: (file: FileItem) => void;
@@ -306,6 +461,7 @@ function GridCard({
   onMoveToRoot: () => void;
   onDragStartFile?: (file: FileItem) => void;
   onShare: (file: FileItem) => void;
+  onPreview: (file: FileItem) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(file.file_name);
@@ -415,7 +571,7 @@ function GridCard({
           )}
           <p className="mt-0.5 text-xs text-dp-text3">{isFolder ? "Folder" : formatBytes(file.size)}</p>
         </div>
-        <ActionsMenu file={file} onRename={() => setEditing(true)} onDownload={handleDownload} onDelete={handleDelete} onShare={() => onShare(file)} inFolder={inFolder} onMoveToRoot={onMoveToRoot} />
+        <ActionsMenu file={file} onRename={() => setEditing(true)} onDownload={handleDownload} onDelete={handleDelete} onShare={() => onShare(file)} onPreview={() => onPreview(file)} inFolder={inFolder} onMoveToRoot={onMoveToRoot} />
       </div>
     </div>
   );
@@ -432,6 +588,7 @@ function ListRow({
   onMoveToRoot,
   onDragStartFile,
   onShare,
+  onPreview,
 }: {
   file: FileItem;
   onOpen: (file: FileItem) => void;
@@ -443,6 +600,7 @@ function ListRow({
   onMoveToRoot: () => void;
   onDragStartFile?: (file: FileItem) => void;
   onShare: (file: FileItem) => void;
+  onPreview: (file: FileItem) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(file.file_name);
@@ -541,13 +699,13 @@ function ListRow({
           )}
         </div>
       </td>
-      <td className="px-4 py-3 text-sm text-dp-text3">{isFolder ? "—" : formatBytes(file.size)}</td>
-      <td className="px-4 py-3">
+      <td className="hidden px-4 py-3 text-sm text-dp-text3 sm:table-cell">{isFolder ? "—" : formatBytes(file.size)}</td>
+      <td className="hidden px-4 py-3 md:table-cell">
         <span className="rounded-md border border-dp-border px-2 py-0.5 text-xs text-dp-text3">#{file.account_index}</span>
       </td>
-      <td className="px-4 py-3 text-sm text-dp-text3">{new Date(file.created_at).toLocaleDateString()}</td>
+      <td className="hidden px-4 py-3 text-sm text-dp-text3 md:table-cell">{new Date(file.created_at).toLocaleDateString()}</td>
       <td className="px-4 py-3">
-        <ActionsMenu file={file} onRename={() => setEditing(true)} onDownload={handleDownload} onDelete={handleDelete} onShare={() => onShare(file)} inFolder={inFolder} onMoveToRoot={onMoveToRoot} />
+        <ActionsMenu file={file} onRename={() => setEditing(true)} onDownload={handleDownload} onDelete={handleDelete} onShare={() => onShare(file)} onPreview={() => onPreview(file)} inFolder={inFolder} onMoveToRoot={onMoveToRoot} />
       </td>
     </tr>
   );
@@ -705,6 +863,7 @@ export default function FilesPage() {
   const [sortBy, setSortBy] = useState<SortKey>("date-desc");
   const [draggedFile, setDraggedFile] = useState<FileItem | null>(null);
   const [shareModal, setShareModal] = useState<{ file: FileItem; link: string | null; loading: boolean; revoking: boolean } | null>(null);
+  const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
 
   useEffect(() => {
     const unsub = addCompleteListener(() => {
@@ -925,6 +1084,10 @@ export default function FilesPage() {
         />
       )}
 
+      {previewFile && (
+        <PreviewModal file={previewFile} onClose={() => setPreviewFile(null)} />
+      )}
+
       {shareModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
@@ -1002,7 +1165,7 @@ export default function FilesPage() {
         </div>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-dp-text">Files</h1>
           <p className="mt-1 text-sm text-dp-text2">
@@ -1020,7 +1183,7 @@ export default function FilesPage() {
             <svg className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
             </svg>
-            {syncing ? "Syncing…" : "Sync"}
+            <span className="hidden sm:inline">{syncing ? "Syncing…" : "Sync"}</span>
           </button>
 
           <div className="flex rounded-lg border border-dp-border bg-dp-s1 p-0.5">
@@ -1141,7 +1304,7 @@ export default function FilesPage() {
       ) : view === "grid" ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {filteredFiles.map((file) => (
-            <GridCard key={file.id} file={file} onOpen={openFolder} onRename={handleRename} onDelete={handleDelete} onMove={handleMove} onUploadInto={upload} inFolder={currentFolder.id !== null} onMoveToRoot={() => handleMove(file.id, "root")} onDragStartFile={handleDragStartFile} onShare={handleShare} />
+            <GridCard key={file.id} file={file} onOpen={openFolder} onRename={handleRename} onDelete={handleDelete} onMove={handleMove} onUploadInto={upload} inFolder={currentFolder.id !== null} onMoveToRoot={() => handleMove(file.id, "root")} onDragStartFile={handleDragStartFile} onShare={handleShare} onPreview={setPreviewFile} />
           ))}
         </div>
       ) : (
@@ -1150,15 +1313,15 @@ export default function FilesPage() {
             <thead>
               <tr className="border-b border-dp-border">
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Size</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Account</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Date</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3 sm:table-cell">Size</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3 md:table-cell">Account</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3 md:table-cell">Date</th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredFiles.map((file) => (
-                <ListRow key={file.id} file={file} onOpen={openFolder} onRename={handleRename} onDelete={handleDelete} onMove={handleMove} onUploadInto={upload} inFolder={currentFolder.id !== null} onMoveToRoot={() => handleMove(file.id, "root")} onDragStartFile={handleDragStartFile} onShare={handleShare} />
+                <ListRow key={file.id} file={file} onOpen={openFolder} onRename={handleRename} onDelete={handleDelete} onMove={handleMove} onUploadInto={upload} inFolder={currentFolder.id !== null} onMoveToRoot={() => handleMove(file.id, "root")} onDragStartFile={handleDragStartFile} onShare={handleShare} onPreview={setPreviewFile} />
               ))}
             </tbody>
           </table>

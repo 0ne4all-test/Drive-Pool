@@ -1,353 +1,148 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 const steps = [
   {
-    id: "fork",
+    id: "clone",
     num: "01",
-    title: "Fork & Clone the Repository",
+    title: "Clone the Repository",
     color: "text-orange-400",
-    border: "border-orange-500/30",
-    bg: "bg-orange-500/10",
-    content: (
-      <div className="space-y-4">
-        <p className="text-sm leading-relaxed text-dp-text2">
-          Start by forking the DrivePool repository on GitHub so you have your own copy to work with.
-        </p>
-        <div className="rounded-xl border border-dp-border bg-dp-bg p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dp-text3">Clone your fork</p>
-          <pre className="overflow-x-auto text-sm text-emerald-400"><code>{`git clone https://github.com/YOUR_USERNAME/DriveCloud.git
-cd DriveCloud`}</code></pre>
-        </div>
-        <div className="rounded-xl border border-dp-border bg-dp-bg p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dp-text3">Project structure</p>
-          <pre className="overflow-x-auto text-xs text-dp-text2"><code>{`DriveCloud/
-├── backend/          ← FastAPI Python app
-│   ├── main.py
-│   ├── routes/
-│   ├── services/
-│   └── models/
-├── frontend/         ← Next.js app
-│   ├── app/
-│   └── components/
-├── config/           ← Place your credentials here
-│   └── credentials_1.json
-├── .env              ← Secrets (you create this)
-└── requirements.txt`}</code></pre>
-        </div>
-      </div>
-    ),
+    accent: "border-orange-500/40",
+    glow: "bg-orange-500/5",
   },
   {
-    id: "google-cloud",
+    id: "credentials",
     num: "02",
-    title: "Create a Google Cloud Project",
+    title: "Create Google Cloud Credentials",
     color: "text-blue-400",
-    border: "border-blue-500/30",
-    bg: "bg-blue-500/10",
-    content: (
-      <div className="space-y-4">
-        <p className="text-sm leading-relaxed text-dp-text2">
-          Each Google Drive account needs its own OAuth credentials. Repeat this process for every account you want to add to the pool.
-        </p>
-        <ol className="space-y-3 text-sm text-dp-text2">
-          {[
-            <>Go to <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" className="text-orange-400 underline">console.cloud.google.com</a> and create a new project.</>,
-            <>Navigate to <strong className="text-dp-text">APIs & Services → Library</strong>, search for <strong className="text-dp-text">Google Drive API</strong>, and enable it.</>,
-            <>Go to <strong className="text-dp-text">APIs & Services → OAuth consent screen</strong>. Choose <strong className="text-dp-text">External</strong>, fill in the app name (e.g. "DrivePool"), and add your own Google account as a <strong className="text-dp-text">test user</strong>.</>,
-            <>Go to <strong className="text-dp-text">APIs & Services → Credentials → Create Credentials → OAuth client ID</strong>. Choose <strong className="text-dp-text">Desktop app</strong> as the application type.</>,
-            <>Download the JSON credentials file. Rename it to <code className="rounded bg-dp-s2 px-1.5 py-0.5 text-xs text-orange-400">credentials_1.json</code> for the first account, <code className="rounded bg-dp-s2 px-1.5 py-0.5 text-xs text-orange-400">credentials_2.json</code> for the second, etc.</>,
-          ].map((step, i) => (
-            <li key={i} className="flex gap-3">
-              <span className="flex-shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-dp-s2 text-[10px] font-bold text-dp-text3 mt-0.5">{i + 1}</span>
-              <span>{step}</span>
-            </li>
-          ))}
-        </ol>
-        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
-          <p className="text-xs font-semibold text-amber-400">⚠ One project per account</p>
-          <p className="mt-1 text-xs text-dp-text2">
-            Create a separate Google Cloud project for each Drive account. Each project gets its own <code className="text-amber-400">credentials_N.json</code> file.
-          </p>
-        </div>
-      </div>
-    ),
+    accent: "border-blue-500/40",
+    glow: "bg-blue-500/5",
   },
   {
     id: "config",
     num: "03",
     title: "Place Credentials in /config",
     color: "text-emerald-400",
-    border: "border-emerald-500/30",
-    bg: "bg-emerald-500/10",
-    content: (
-      <div className="space-y-4">
-        <p className="text-sm leading-relaxed text-dp-text2">
-          Place all your downloaded credential files in the <code className="rounded bg-dp-s2 px-1.5 py-0.5 text-xs text-emerald-400">config/</code> folder at the project root. DrivePool auto-discovers them by number.
-        </p>
-        <div className="rounded-xl border border-dp-border bg-dp-bg p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dp-text3">Example with 3 accounts</p>
-          <pre className="text-sm text-emerald-400"><code>{`config/
-├── credentials_1.json   ← Account #1
-├── credentials_2.json   ← Account #2
-└── credentials_3.json   ← Account #3`}</code></pre>
-        </div>
-        <p className="text-sm text-dp-text2">
-          Any <code className="rounded bg-dp-s2 px-1.5 py-0.5 text-xs text-dp-text">credentials_*.json</code> file in this folder is picked up automatically on backend startup. Add or remove files and restart to scale your pool.
-        </p>
-      </div>
-    ),
+    accent: "border-emerald-500/40",
+    glow: "bg-emerald-500/5",
   },
   {
     id: "secrets",
     num: "04",
-    title: "Generate Secrets & Configure .env",
-    color: "text-orange-400",
-    border: "border-orange-500/30",
-    bg: "bg-orange-500/10",
-    content: (
-      <div className="space-y-4">
-        <p className="text-sm leading-relaxed text-dp-text2">
-          Run the included helper script to generate your PIN hash, JWT secret, and encryption key.
-        </p>
-        <div className="rounded-xl border border-dp-border bg-dp-bg p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dp-text3">Install Python deps first</p>
-          <pre className="overflow-x-auto text-sm text-emerald-400"><code>{`pip install -r requirements.txt`}</code></pre>
-        </div>
-        <div className="rounded-xl border border-dp-border bg-dp-bg p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dp-text3">Run the secrets generator</p>
-          <pre className="overflow-x-auto text-sm text-emerald-400"><code>{`python backend/scripts/generate_secrets.py`}</code></pre>
-          <p className="mt-2 text-xs text-dp-text3">Enter a PIN when prompted. The script prints three values — copy them.</p>
-        </div>
-        <div className="rounded-xl border border-dp-border bg-dp-bg p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dp-text3">Create .env in the project root</p>
-          <pre className="overflow-x-auto text-sm text-dp-text2"><code>{`DASHBOARD_PIN_HASH=<paste from script>
-JWT_SECRET=<paste from script>
-ENCRYPTION_KEY=<paste from script>
-FRONTEND_URL=http://localhost:3000`}</code></pre>
-        </div>
-        <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
-          <p className="text-xs font-semibold text-red-400">🔒 Never commit .env</p>
-          <p className="mt-1 text-xs text-dp-text2">
-            The <code className="text-red-400">.env</code> file is in <code className="text-red-400">.gitignore</code>. Never push it — it contains your PIN hash and encryption key.
-          </p>
-        </div>
-      </div>
-    ),
+    title: "Generate Secrets",
+    color: "text-violet-400",
+    accent: "border-violet-500/40",
+    glow: "bg-violet-500/5",
   },
   {
     id: "backend",
     num: "05",
     title: "Start the Backend",
     color: "text-sky-400",
-    border: "border-sky-500/30",
-    bg: "bg-sky-500/10",
-    content: (
-      <div className="space-y-4">
-        <p className="text-sm leading-relaxed text-dp-text2">
-          The backend is a FastAPI app served by Uvicorn. It creates the SQLite database, runs migrations, and discovers your credential files on startup.
-        </p>
-        <div className="rounded-xl border border-dp-border bg-dp-bg p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dp-text3">From the project root</p>
-          <pre className="overflow-x-auto text-sm text-emerald-400"><code>{`uvicorn backend.main:app --reload --port 8000`}</code></pre>
-        </div>
-        <div className="rounded-xl border border-dp-border bg-dp-bg p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dp-text3">Verify it works</p>
-          <p className="text-sm text-dp-text2">Open <span className="text-orange-400">http://localhost:8000/docs</span> — you should see the Swagger UI with all API routes.</p>
-        </div>
-        <p className="text-sm text-dp-text2">
-          The backend serves the API at <code className="rounded bg-dp-s2 px-1.5 py-0.5 text-xs text-dp-text">/api/*</code>. The frontend proxies requests to it automatically via Next.js rewrites.
-        </p>
-      </div>
-    ),
+    accent: "border-sky-500/40",
+    glow: "bg-sky-500/5",
   },
   {
     id: "frontend",
     num: "06",
     title: "Start the Frontend",
     color: "text-pink-400",
-    border: "border-pink-500/30",
-    bg: "bg-pink-500/10",
-    content: (
-      <div className="space-y-4">
-        <p className="text-sm leading-relaxed text-dp-text2">
-          The frontend is a Next.js app. Install dependencies and start the dev server.
-        </p>
-        <div className="rounded-xl border border-dp-border bg-dp-bg p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dp-text3">Install and start</p>
-          <pre className="overflow-x-auto text-sm text-emerald-400"><code>{`cd frontend
-npm install
-npm run dev`}</code></pre>
-        </div>
-        <div className="rounded-xl border border-dp-border bg-dp-bg p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-dp-text3">next.config.ts — API proxy</p>
-          <p className="text-sm text-dp-text2">
-            The Next.js config rewrites <code className="rounded bg-dp-s2 px-1.5 py-0.5 text-xs text-dp-text">/api/*</code> to <code className="rounded bg-dp-s2 px-1.5 py-0.5 text-xs text-dp-text">http://localhost:8000/api/*</code>. Both servers must be running simultaneously.
-          </p>
-        </div>
-        <p className="text-sm text-dp-text2">
-          Visit <span className="text-orange-400">http://localhost:3000</span> — the landing page should appear.
-        </p>
-      </div>
-    ),
+    accent: "border-pink-500/40",
+    glow: "bg-pink-500/5",
   },
   {
-    id: "oauth",
+    id: "connect",
     num: "07",
-    title: "Connect Your Drive Accounts",
+    title: "Connect Drive Accounts",
     color: "text-yellow-400",
-    border: "border-yellow-500/30",
-    bg: "bg-yellow-500/10",
-    content: (
-      <div className="space-y-4">
-        <p className="text-sm leading-relaxed text-dp-text2">
-          Each Drive account must be authorized via OAuth before DrivePool can access it. This only needs to be done once per account.
-        </p>
-        <ol className="space-y-3 text-sm text-dp-text2">
-          {[
-            <>Go to <span className="text-orange-400">http://localhost:3000/login</span> and enter your PIN.</>,
-            <>Navigate to <strong className="text-dp-text">Settings</strong> in the sidebar. You'll see all discovered accounts (one per credentials file).</>,
-            <>Click <strong className="text-dp-text">Connect Account</strong> on each disconnected account. You'll be redirected to Google's OAuth consent screen.</>,
-            <>Sign in with the corresponding Google account and grant Drive access. You'll be redirected back to the dashboard.</>,
-            <>The account status changes to <strong className="text-emerald-400">Connected</strong> and its storage quota is displayed.</>,
-          ].map((step, i) => (
-            <li key={i} className="flex gap-3">
-              <span className="flex-shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-dp-s2 text-[10px] font-bold text-dp-text3 mt-0.5">{i + 1}</span>
-              <span>{step}</span>
-            </li>
-          ))}
-        </ol>
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
-          <p className="text-xs font-semibold text-emerald-400">✓ Tokens are encrypted</p>
-          <p className="mt-1 text-xs text-dp-text2">
-            Refresh tokens are encrypted with Fernet using your <code className="text-emerald-400">ENCRYPTION_KEY</code> before being stored in the local SQLite database.
-          </p>
-        </div>
-      </div>
-    ),
+    accent: "border-yellow-500/40",
+    glow: "bg-yellow-500/5",
   },
   {
-    id: "use",
+    id: "scale",
     num: "08",
-    title: "Start Using DrivePool",
-    color: "text-orange-400",
-    border: "border-orange-500/30",
-    bg: "bg-orange-500/10",
-    content: (
-      <div className="space-y-4">
-        <p className="text-sm leading-relaxed text-dp-text2">
-          With accounts connected, DrivePool is ready. Files are automatically routed to the account with the most free space.
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {[
-            { icon: "⬆", title: "Upload Files", desc: "Drag & drop or click to browse in the Files page. DrivePool picks the best account automatically." },
-            { icon: "📁", title: "Browse Folders", desc: "Click any folder to navigate into it. Use the breadcrumb bar to go back." },
-            { icon: "⬇", title: "Download", desc: "Hover any file and click the download icon. The file streams directly from Drive." },
-            { icon: "✏️", title: "Rename", desc: "Click any filename to rename it inline. Changes sync to Google Drive instantly." },
-            { icon: "🔄", title: "Sync", desc: "Click Sync to pull in files added directly in Google Drive." },
-            { icon: "📊", title: "Analytics", desc: "Visit the Analytics page for upload history, storage breakdown, and file type charts." },
-          ].map((item) => (
-            <div key={item.title} className="rounded-xl border border-dp-border bg-dp-bg p-4">
-              <p className="mb-1 text-sm font-medium text-dp-text">{item.icon} {item.title}</p>
-              <p className="text-xs text-dp-text2">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: "scaling",
-    num: "09",
-    title: "Adding More Accounts Later",
+    title: "Add More Accounts",
     color: "text-emerald-400",
-    border: "border-emerald-500/30",
-    bg: "bg-emerald-500/10",
-    content: (
-      <div className="space-y-4">
-        <p className="text-sm leading-relaxed text-dp-text2">
-          Adding more storage is as simple as adding more credential files. No configuration file changes required.
-        </p>
-        <ol className="space-y-3 text-sm text-dp-text2">
-          {[
-            "Create a new Google Cloud project and repeat Step 02.",
-            <>Download the credentials JSON and save it as <code className="rounded bg-dp-s2 px-1.5 py-0.5 text-xs text-dp-text">credentials_N.json</code> in the config/ folder (use the next number in sequence).</>,
-            "Restart the backend. The new account appears in Settings as 'Disconnected'.",
-            "Click Connect Account and authorize it via OAuth.",
-            "Done — your storage pool just grew by 15 GB.",
-          ].map((step, i) => (
-            <li key={i} className="flex gap-3">
-              <span className="flex-shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-dp-s2 text-[10px] font-bold text-dp-text3 mt-0.5">{i + 1}</span>
-              <span>{step}</span>
-            </li>
-          ))}
-        </ol>
-        <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-4">
-          <p className="text-xs font-semibold text-orange-400">♾ Unlimited scaling</p>
-          <p className="mt-1 text-xs text-dp-text2">
-            There is no hard limit on the number of accounts. Each free Google account adds 15 GB. 10 accounts = 150 GB of free cloud storage.
-          </p>
-        </div>
-      </div>
-    ),
+    accent: "border-emerald-500/40",
+    glow: "bg-emerald-500/5",
   },
 ];
 
-function StepCard({ step, isOpen, onToggle }: { step: typeof steps[0]; isOpen: boolean; onToggle: () => void }) {
+function Code({ children }: { children: string }) {
   return (
-    <div className={`rounded-2xl border transition-all duration-200 ${isOpen ? step.border + " bg-dp-s1" : "border-dp-border bg-dp-s1 hover:border-dp-text3/30"}`}>
-      <button
-        onClick={onToggle}
-        className="flex w-full items-center gap-4 px-6 py-5 text-left"
-      >
-        <span className={`flex-shrink-0 text-xs font-bold tabular-nums ${step.color}`}>{step.num}</span>
-        <span className="flex-1 text-sm font-medium text-dp-text">{step.title}</span>
-        <svg
-          className={`h-4 w-4 flex-shrink-0 text-dp-text3 transition-transform ${isOpen ? "rotate-180" : ""}`}
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {isOpen && (
-        <div className="border-t border-dp-border px-6 pb-6 pt-5">
-          {step.content}
+    <code className="rounded bg-dp-s2 px-1.5 py-0.5 text-xs text-orange-400 font-mono">
+      {children}
+    </code>
+  );
+}
+
+function Block({ label, children }: { label?: string; children: string }) {
+  return (
+    <div className="rounded-xl border border-dp-border bg-black/20 overflow-hidden">
+      {label && (
+        <div className="border-b border-dp-border px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-dp-text3">
+          {label}
         </div>
       )}
+      <pre className="overflow-x-auto px-4 py-4 text-sm text-emerald-400 font-mono leading-relaxed">
+        <code>{children}</code>
+      </pre>
     </div>
+  );
+}
+
+function Note({ type, children }: { type: "info" | "warn" | "tip"; children: React.ReactNode }) {
+  const styles = {
+    info: { border: "border-blue-500/20", bg: "bg-blue-500/5", text: "text-blue-400", label: "Note" },
+    warn: { border: "border-amber-500/20", bg: "bg-amber-500/5", text: "text-amber-400", label: "Important" },
+    tip: { border: "border-emerald-500/20", bg: "bg-emerald-500/5", text: "text-emerald-400", label: "Tip" },
+  }[type];
+  return (
+    <div className={`rounded-xl border ${styles.border} ${styles.bg} p-4`}>
+      <span className={`text-xs font-bold ${styles.text}`}>{styles.label} — </span>
+      <span className="text-xs text-dp-text2 leading-relaxed">{children}</span>
+    </div>
+  );
+}
+
+function NumberedList({ items }: { items: React.ReactNode[] }) {
+  return (
+    <ol className="space-y-2.5">
+      {items.map((item, i) => (
+        <li key={i} className="flex gap-3 text-sm text-dp-text2">
+          <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-dp-s2 text-[10px] font-bold text-dp-text3">
+            {i + 1}
+          </span>
+          <span className="leading-relaxed">{item}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
 
 export default function DocsPage() {
   const { theme, toggle } = useTheme();
-  const [openStep, setOpenStep] = useState<string>("fork");
-
-  function toggleStep(id: string) {
-    setOpenStep((prev) => (prev === id ? "" : id));
-  }
 
   return (
-    <div className="min-h-screen bg-dp-bg">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-dp-border bg-dp-sidebar/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-3">
+    <div className="min-h-screen bg-dp-bg text-dp-text">
+      {/* ── Navbar ─────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-50 border-b border-dp-border bg-dp-bg/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-orange-500/20 bg-orange-500/10">
               <svg className="h-3.5 w-3.5 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
               </svg>
             </div>
-            <span className="text-sm font-semibold text-dp-text">DrivePool</span>
+            <span className="text-sm font-semibold">DrivePool</span>
             <span className="rounded-full border border-dp-border px-2 py-0.5 text-[10px] text-dp-text3">Docs</span>
           </Link>
           <div className="flex items-center gap-3">
             <button
               onClick={toggle}
               className="flex h-7 w-7 items-center justify-center rounded-lg text-dp-text3 transition hover:bg-dp-hover hover:text-dp-text"
-              title="Toggle theme"
             >
               {theme === "dark" ? (
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -369,111 +164,394 @@ export default function DocsPage() {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-4xl px-6 py-12">
-        {/* Hero */}
-        <div className="mb-12 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/5 px-4 py-1.5">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        {/* ── Hero ─────────────────────────────────────────── */}
+        <div className="mb-16 max-w-2xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/5 px-3 py-1">
             <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
             <span className="text-xs font-medium text-orange-400">Setup Guide</span>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-dp-text">
-            Get Started with <span className="gradient-text">DrivePool</span>
+          <h1 className="mb-4 text-4xl font-bold tracking-tight text-dp-text md:text-5xl">
+            Get up and running
+            <br />
+            <span className="gradient-text">in 15 minutes</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-dp-text2">
-            Follow these steps to deploy your own unified Google Drive storage pool. From zero to a fully working multi-account dashboard in under 15 minutes.
+          <p className="text-lg leading-relaxed text-dp-text2">
+            From zero to a fully working multi-account Google Drive dashboard. No cloud accounts, no paid services — just your machine and your Google credentials.
           </p>
-
-          {/* Quick prereqs */}
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {[
-              { label: "Python 3.10+", icon: "🐍" },
-              { label: "Node.js 18+", icon: "🟢" },
-              { label: "Google Account(s)", icon: "📧" },
-              { label: "Git", icon: "🌿" },
-            ].map((p) => (
-              <div key={p.label} className="flex items-center gap-1.5 rounded-lg border border-dp-border bg-dp-s1 px-3 py-1.5 text-xs text-dp-text2">
-                <span>{p.icon}</span>
-                {p.label}
-              </div>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {["Python 3.10+", "Node.js 18+", "Google Account(s)", "Git"].map((p) => (
+              <span key={p} className="rounded-lg border border-dp-border bg-dp-s1 px-3 py-1.5 text-xs text-dp-text2">
+                {p}
+              </span>
             ))}
           </div>
         </div>
 
-        {/* Steps — accordion */}
-        <div className="space-y-3">
-          {steps.map((step) => (
-            <StepCard
-              key={step.id}
-              step={step}
-              isOpen={openStep === step.id}
-              onToggle={() => toggleStep(step.id)}
-            />
-          ))}
-        </div>
+        {/* ── Two-column layout ──────────────────────────────── */}
+        <div className="flex gap-12">
+          {/* Left — sticky nav */}
+          <aside className="hidden w-48 flex-shrink-0 lg:block">
+            <div className="sticky top-20">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-dp-text3">Steps</p>
+              <nav className="space-y-1">
+                {steps.map((s) => (
+                  <a
+                    key={s.id}
+                    href={`#${s.id}`}
+                    className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-xs text-dp-text2 transition hover:bg-dp-hover hover:text-dp-text"
+                  >
+                    <span className={`text-[10px] font-bold tabular-nums ${s.color}`}>{s.num}</span>
+                    <span>{s.title}</span>
+                  </a>
+                ))}
+                <div className="my-3 border-t border-dp-border" />
+                <a href="#faq" className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-xs text-dp-text2 transition hover:bg-dp-hover hover:text-dp-text">
+                  <span className="text-[10px] font-bold tabular-nums text-dp-text3">—</span>
+                  <span>FAQ</span>
+                </a>
+                <a href="#troubleshooting" className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-xs text-dp-text2 transition hover:bg-dp-hover hover:text-dp-text">
+                  <span className="text-[10px] font-bold tabular-nums text-dp-text3">—</span>
+                  <span>Troubleshooting</span>
+                </a>
+              </nav>
+            </div>
+          </aside>
 
-        {/* FAQ */}
-        <div className="mt-16">
-          <h2 className="mb-6 text-xl font-semibold text-dp-text">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {[
-              {
-                q: "Is my data safe?",
-                a: "Yes. DrivePool runs entirely on your local machine. Your files are stored in your own Google Drive accounts — not on any DrivePool server. OAuth refresh tokens are encrypted with AES-256 (Fernet) before being written to the local database.",
-              },
-              {
-                q: "How many accounts can I add?",
-                a: "There is no limit. Each account contributes its full storage quota (typically 15 GB for free accounts). The more credentials files you place in config/, the larger your pool.",
-              },
-              {
-                q: "What happens if an account runs out of space?",
-                a: "DrivePool always routes new uploads to the account with the most free space (least-used-space strategy). If all accounts are full, the upload will fail with a 503 error.",
-              },
-              {
-                q: "Can I access files I added directly in Google Drive?",
-                a: "Yes. Click the Sync button in the Files page to pull in any files or folders that were added directly in Drive. DrivePool syncs metadata — not file content — so syncing is fast.",
-              },
-              {
-                q: "Does it work on Windows / Mac / Linux?",
-                a: "Yes. Both Python (backend) and Node.js (frontend) are cross-platform. The only requirement is that both servers can communicate on localhost.",
-              },
-              {
-                q: "Can I run it in production / on a server?",
-                a: "DrivePool is designed for local/self-hosted use. You can expose it through a reverse proxy (nginx/caddy) with HTTPS, but you're responsible for securing the OAuth callback URL and updating FRONTEND_URL in .env accordingly.",
-              },
-            ].map((faq) => (
-              <div key={faq.q} className="rounded-xl border border-dp-border bg-dp-s1 p-5">
-                <p className="text-sm font-medium text-dp-text">{faq.q}</p>
-                <p className="mt-2 text-sm text-dp-text2 leading-relaxed">{faq.a}</p>
+          {/* Right — content */}
+          <div className="min-w-0 flex-1 space-y-16">
+
+            {/* ── Step 01 ── */}
+            <section id="clone">
+              <StepHeader num="01" color="text-orange-400" accent="border-orange-500/40" title="Clone the Repository" />
+              <div className="space-y-4">
+                <p className="text-sm leading-relaxed text-dp-text2">
+                  Fork the repository on GitHub to get your own copy, then clone it locally.
+                </p>
+                <Block label="Terminal">
+{`git clone https://github.com/saimon4u/Drive-Pool.git
+cd Drive-Pool`}
+                </Block>
               </div>
-            ))}
+            </section>
+
+            {/* ── Step 02 ── */}
+            <section id="credentials">
+              <StepHeader num="02" color="text-blue-400" accent="border-blue-500/40" title="Create Google Cloud Credentials" />
+              <div className="space-y-5">
+                <p className="text-sm leading-relaxed text-dp-text2">
+                  Each Google Drive account needs its own OAuth credentials. Repeat this entire process for every account you want to add.
+                </p>
+                <NumberedList items={[
+                  <>Go to <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" className="text-orange-400 underline underline-offset-2">console.cloud.google.com</a> and create a <strong className="text-dp-text">new project</strong>.</>,
+                  <>Navigate to <strong className="text-dp-text">APIs &amp; Services → Library</strong>, search for <strong className="text-dp-text">Google Drive API</strong>, and enable it.</>,
+                  <>Go to <strong className="text-dp-text">APIs &amp; Services → OAuth consent screen</strong>. Choose <strong className="text-dp-text">External</strong>, fill in any app name, and add your own Google account as a <strong className="text-dp-text">test user</strong>.</>,
+                  <>Go to <strong className="text-dp-text">Credentials → Create Credentials → OAuth client ID</strong>. Choose <strong className="text-dp-text">Desktop app</strong> as the application type.</>,
+                  <>Download the JSON file. You&apos;ll place it in the next step.</>,
+                ]} />
+                <Note type="warn">
+                  Create a separate Google Cloud project for each Drive account. Using the same project for multiple accounts causes OAuth conflicts.
+                </Note>
+              </div>
+            </section>
+
+            {/* ── Step 03 ── */}
+            <section id="config">
+              <StepHeader num="03" color="text-emerald-400" accent="border-emerald-500/40" title="Place Credentials in /config" />
+              <div className="space-y-4">
+                <p className="text-sm leading-relaxed text-dp-text2">
+                  Place all downloaded credential files in the <Code>config/</Code> folder at the project root. DrivePool auto-discovers them by number on startup.
+                </p>
+                <Block label="config/ folder — example with 3 accounts">
+{`config/
+├── credentials_1.json   ← Account #1
+├── credentials_2.json   ← Account #2
+└── credentials_3.json   ← Account #3`}
+                </Block>
+                <Note type="tip">
+                  Adding more accounts later is just as simple — drop in another <Code>credentials_N.json</Code> and restart the backend.
+                </Note>
+              </div>
+            </section>
+
+            {/* ── Step 04 ── */}
+            <section id="secrets">
+              <StepHeader num="04" color="text-violet-400" accent="border-violet-500/40" title="Generate Secrets" />
+              <div className="space-y-4">
+                <p className="text-sm leading-relaxed text-dp-text2">
+                  Install Python dependencies, then run the setup script. It will prompt you for a dashboard PIN and write all secrets directly into the local database — no <Code>.env</Code> file needed.
+                </p>
+                <Block label="Install dependencies">
+{`pip install -r backend/requirements.txt`}
+                </Block>
+                <Block label="Generate secrets">
+{`python backend/scripts/generate_secrets.py`}
+                </Block>
+                <div className="rounded-xl border border-dp-border bg-dp-s1 p-5">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-dp-text3">What the script does</p>
+                  <ul className="space-y-2">
+                    {[
+                      ["PIN hash", "Hashes your PIN with bcrypt and stores it as dashboard_pin_hash"],
+                      ["JWT secret", "Generates a cryptographically random 32-byte secret for signing session tokens"],
+                      ["Encryption key", "Generates a Fernet key (AES-128-CBC) for encrypting OAuth refresh tokens at rest"],
+                    ].map(([k, v]) => (
+                      <li key={k} className="flex gap-3 text-xs">
+                        <span className="flex-shrink-0 font-semibold text-dp-text">{k}</span>
+                        <span className="text-dp-text2">{v}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <Note type="info">
+                  All three secrets are stored in the <Code>app_config</Code> table inside <Code>backend/drivepool.db</Code>. Re-run the script at any time to change your PIN — it will ask before overwriting.
+                </Note>
+              </div>
+            </section>
+
+            {/* ── Step 05 ── */}
+            <section id="backend">
+              <StepHeader num="05" color="text-sky-400" accent="border-sky-500/40" title="Start the Backend" />
+              <div className="space-y-4">
+                <p className="text-sm leading-relaxed text-dp-text2">
+                  The backend is a FastAPI app served by Uvicorn. On startup it creates the database tables, runs migrations, discovers your credential files, and syncs file metadata from all connected Drive accounts.
+                </p>
+                <Block label="From the project root">
+{`uvicorn backend.main:app --reload --port 8000`}
+                </Block>
+                <Note type="tip">
+                  Verify it works by opening <span className="font-mono text-orange-400">http://localhost:8000/docs</span> — you should see the Swagger UI with all API routes.
+                </Note>
+              </div>
+            </section>
+
+            {/* ── Step 06 ── */}
+            <section id="frontend">
+              <StepHeader num="06" color="text-pink-400" accent="border-pink-500/40" title="Start the Frontend" />
+              <div className="space-y-4">
+                <p className="text-sm leading-relaxed text-dp-text2">
+                  The frontend is a Next.js (App Router) app. Install dependencies and start the dev server. It must run alongside the backend simultaneously.
+                </p>
+                <Block label="Terminal 2">
+{`cd frontend
+npm install
+npm run dev`}
+                </Block>
+                <p className="text-sm text-dp-text2">
+                  Open <span className="font-mono text-orange-400">http://localhost:3000</span>. The Next.js config rewrites all <Code>/api/*</Code> requests to <Code>http://localhost:8000/api/*</Code> automatically.
+                </p>
+              </div>
+            </section>
+
+            {/* ── Step 07 ── */}
+            <section id="connect">
+              <StepHeader num="07" color="text-yellow-400" accent="border-yellow-500/40" title="Connect Your Drive Accounts" />
+              <div className="space-y-5">
+                <p className="text-sm leading-relaxed text-dp-text2">
+                  Each account must be authorized via Google OAuth once before DrivePool can access it.
+                </p>
+                <NumberedList items={[
+                  <>Navigate to <span className="font-mono text-orange-400">http://localhost:3000/login</span> and enter your PIN.</>,
+                  <>Click <strong className="text-dp-text">Settings</strong> in the left sidebar. You&apos;ll see one card per credentials file.</>,
+                  <>Click <strong className="text-dp-text">Connect Account</strong> on each disconnected card. You&apos;ll be redirected to Google&apos;s OAuth consent screen.</>,
+                  <>Sign in with the matching Google account and grant Drive access. You&apos;ll be redirected back automatically.</>,
+                  <>The card turns green and shows the account&apos;s storage quota. You&apos;re ready to upload.</>,
+                ]} />
+                <Note type="info">
+                  OAuth refresh tokens are encrypted with Fernet before being stored in the database — they are never saved in plain text.
+                </Note>
+              </div>
+            </section>
+
+            {/* ── Step 08 ── */}
+            <section id="scale">
+              <StepHeader num="08" color="text-emerald-400" accent="border-emerald-500/40" title="Add More Accounts Later" />
+              <div className="space-y-4">
+                <p className="text-sm leading-relaxed text-dp-text2">
+                  Expanding your storage pool is a one-minute operation. No config changes needed.
+                </p>
+                <NumberedList items={[
+                  "Create a new Google Cloud project and repeat Step 02.",
+                  <>Save the credentials JSON as <Code>credentials_N.json</Code> in the <Code>config/</Code> folder (next number in sequence).</>,
+                  "Restart the backend — the new account appears in Settings as Disconnected.",
+                  "Click Connect Account and authorize via OAuth.",
+                  "Done — your pool just grew by 15 GB.",
+                ]} />
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5 text-center">
+                  <p className="text-2xl font-bold text-dp-text">N × 15 GB</p>
+                  <p className="mt-1 text-xs text-dp-text2">No hard limit on accounts. 10 accounts = 150 GB free.</p>
+                </div>
+              </div>
+            </section>
+
+            {/* ── Dashboard Features ──────────────────────────── */}
+            <section>
+              <div className="mb-8">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-dp-text3">Feature Reference</p>
+                <h2 className="text-2xl font-bold text-dp-text">What&apos;s inside the dashboard</h2>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  {
+                    label: "Overview", color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20",
+                    items: ["Stats cards — files, folders, storage, free space", "Per-account storage bars", "File type distribution", "Recent files with thumbnails"],
+                  },
+                  {
+                    label: "Files", color: "text-sky-400", bg: "bg-sky-500/10", border: "border-sky-500/20",
+                    items: ["Upload (drag & drop or click)", "Grid and list view toggle", "Sort, filter, search", "Folder navigation with breadcrumb", "Inline rename, download, trash", "Drag-to-folder side panel"],
+                  },
+                  {
+                    label: "Shared with Me", color: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20",
+                    items: ["Files others shared with your accounts", "Navigate into shared folders", "Grid and list view", "Sort by date / name / size", "Download directly"],
+                  },
+                  {
+                    label: "Trash", color: "text-rose-400", bg: "bg-rose-500/10", border: "border-rose-500/20",
+                    items: ["All trashed files across accounts", "Restore to Drive", "Permanently delete", "Grid and list view, search, sort"],
+                  },
+                  {
+                    label: "Analytics", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20",
+                    items: ["Weekly upload activity chart", "Storage by account (used vs free)", "Files by type (donut chart)", "Storage by type (horizontal bars)"],
+                  },
+                  {
+                    label: "Settings", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20",
+                    items: ["Total pool summary", "Per-account quota bars", "Connect / Disconnect accounts", "Profile: display name, bio, avatar"],
+                  },
+                ].map((page) => (
+                  <div key={page.label} className={`rounded-2xl border ${page.border} bg-dp-s1 p-5`}>
+                    <div className={`mb-3 inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold ${page.color} ${page.bg}`}>{page.label}</div>
+                    <ul className="space-y-1.5">
+                      {page.items.map((item) => (
+                        <li key={item} className={`flex items-start gap-2 text-xs text-dp-text2`}>
+                          <span className={`mt-0.5 flex-shrink-0 ${page.color}`}>›</span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── FAQ ──────────────────────────────────────────── */}
+            <section id="faq">
+              <div className="mb-8">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-dp-text3">FAQ</p>
+                <h2 className="text-2xl font-bold text-dp-text">Frequently Asked Questions</h2>
+              </div>
+              <div className="divide-y divide-dp-border rounded-2xl border border-dp-border bg-dp-s1 overflow-hidden">
+                {[
+                  {
+                    q: "Is my data safe?",
+                    a: "Yes. DrivePool runs entirely on your local machine. Files are stored in your own Google Drive accounts. OAuth tokens are encrypted with AES-128 (Fernet) before being written to the local database.",
+                  },
+                  {
+                    q: "How many accounts can I add?",
+                    a: "There is no limit. Each account adds its full storage quota to the pool. 10 free accounts = 150 GB.",
+                  },
+                  {
+                    q: "What happens if an account is full?",
+                    a: "DrivePool always routes to the account with the most free space. If all accounts are full, the upload fails with a 503 error. Add another account to fix it.",
+                  },
+                  {
+                    q: "Can I access files I added directly in Google Drive?",
+                    a: "Yes. Click Sync in the Files page. DrivePool syncs only metadata — not file content — so it's fast.",
+                  },
+                  {
+                    q: "Can I move files between accounts?",
+                    a: "Within one account, drag any file and drop it into a folder from the slide-in panel. Cross-account moves are not supported — the Drive API does not allow transferring file ownership.",
+                  },
+                  {
+                    q: "Does it work on Windows / Mac / Linux?",
+                    a: "Yes. Python and Node.js are both cross-platform.",
+                  },
+                  {
+                    q: "Can I expose it on the internet?",
+                    a: "DrivePool is designed for local/self-hosted use. You can put it behind a reverse proxy (nginx, Caddy) with HTTPS, but you're responsible for securing the OAuth callback and setting FRONTEND_URL accordingly.",
+                  },
+                ].map((faq) => (
+                  <div key={faq.q} className="p-5">
+                    <p className="mb-1.5 text-sm font-semibold text-dp-text">{faq.q}</p>
+                    <p className="text-sm leading-relaxed text-dp-text2">{faq.a}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── Troubleshooting ──────────────────────────────── */}
+            <section id="troubleshooting">
+              <div className="mb-8">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-dp-text3">Troubleshooting</p>
+                <h2 className="text-2xl font-bold text-dp-text">Common Issues</h2>
+              </div>
+              <div className="space-y-3">
+                {[
+                  {
+                    q: "Backend fails to start — config key missing",
+                    a: "Run python backend/scripts/generate_secrets.py. The script creates the app_config table and inserts the three required keys.",
+                  },
+                  {
+                    q: "OAuth callback returns an error",
+                    a: "Check that the authorized redirect URI in Google Cloud Console is exactly http://localhost:8000/api/auth/callback. Also confirm your account is added as a test user on the consent screen.",
+                  },
+                  {
+                    q: "Files don't appear after uploading directly in Drive",
+                    a: "DrivePool doesn't watch Drive in real time. Click the Sync button in the Files page to pull in new files.",
+                  },
+                  {
+                    q: "Upload fails with 503",
+                    a: "All connected accounts are full. Add another Google account (Step 08).",
+                  },
+                  {
+                    q: "Account shows Disconnected after restart",
+                    a: "The refresh token may have been revoked by Google. Go to Settings and reconnect via OAuth.",
+                  },
+                  {
+                    q: "CORS error in the browser",
+                    a: "Ensure both servers are running — backend on :8000, frontend on :3000. The Next.js dev proxy handles /api/* rewrites automatically.",
+                  },
+                ].map((item) => (
+                  <div key={item.q} className="rounded-xl border border-dp-border bg-dp-s1 p-5">
+                    <p className="mb-1.5 flex items-start gap-2 text-sm font-semibold text-dp-text">
+                      <span className="mt-0.5 flex-shrink-0 text-amber-400">!</span>
+                      {item.q}
+                    </p>
+                    <p className="pl-5 text-sm leading-relaxed text-dp-text2">{item.a}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── CTA ──────────────────────────────────────────── */}
+            <section>
+              <div className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-10 text-center">
+                <h2 className="text-2xl font-bold text-dp-text">Ready?</h2>
+                <p className="mt-2 text-dp-text2">Open the dashboard and start managing your storage pool.</p>
+                <div className="mt-6 flex flex-wrap justify-center gap-3">
+                  <Link href="/login" className="rounded-xl bg-orange-500 px-6 py-3 font-semibold text-white shadow shadow-orange-500/25 transition hover:bg-orange-400">
+                    Open Dashboard
+                  </Link>
+                  <Link href="/" className="rounded-xl border border-dp-border bg-dp-s1 px-6 py-3 font-semibold text-dp-text transition hover:border-orange-500/30">
+                    Back to Home
+                  </Link>
+                </div>
+              </div>
+              <p className="mt-8 text-center text-xs text-dp-text3">
+                DrivePool is free and open source.{" "}
+                <a href="https://github.com/saimon4u/Drive-Pool" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">View on GitHub.</a>
+              </p>
+            </section>
+
           </div>
         </div>
-
-        {/* CTA */}
-        <div className="mt-16 rounded-2xl border border-orange-500/20 bg-orange-500/5 p-10 text-center">
-          <h2 className="text-2xl font-bold text-dp-text">Ready to go?</h2>
-          <p className="mt-2 text-dp-text2">Open the dashboard and start managing your unified storage pool.</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/login"
-              className="rounded-xl bg-orange-500 px-6 py-3 font-semibold text-white shadow shadow-orange-500/25 transition hover:bg-orange-400"
-            >
-              Open Dashboard
-            </Link>
-            <Link
-              href="/"
-              className="rounded-xl border border-dp-border bg-dp-s1 px-6 py-3 font-semibold text-dp-text transition hover:border-orange-500/30"
-            >
-              Back to Home
-            </Link>
-          </div>
-        </div>
-
-        <p className="mt-10 text-center text-xs text-dp-text3">
-          DrivePool is open source and free forever. Contribute on{" "}
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">GitHub</a>.
-        </p>
       </div>
+    </div>
+  );
+}
+
+function StepHeader({ num, color, accent, title }: { num: string; color: string; accent: string; title: string }) {
+  return (
+    <div className={`mb-6 flex items-center gap-4 border-l-2 ${accent} pl-5`}>
+      <span className={`text-xs font-bold tabular-nums ${color}`}>{num}</span>
+      <h2 className="text-xl font-bold text-dp-text">{title}</h2>
     </div>
   );
 }

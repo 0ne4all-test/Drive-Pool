@@ -106,7 +106,7 @@ export default function SharedPage() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-dp-text">Shared with me</h1>
           <p className="mt-1 text-sm text-dp-text2">
@@ -255,10 +255,10 @@ export default function SharedPage() {
             <thead>
               <tr className="border-b border-dp-border">
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Shared by</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Size</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Account</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Date</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3 sm:table-cell">Shared by</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3 sm:table-cell">Size</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3 md:table-cell">Account</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3 md:table-cell">Date</th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Download</th>
               </tr>
             </thead>
@@ -274,12 +274,12 @@ export default function SharedPage() {
                         <span className={`text-sm text-dp-text ${folder ? "hover:text-orange-400" : ""}`} title={file.file_name}>{file.file_name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-dp-text3">{file.shared_by ?? "—"}</td>
-                    <td className="px-4 py-3 text-sm text-dp-text3">{folder ? "—" : formatBytes(file.size)}</td>
-                    <td className="px-4 py-3">
+                    <td className="hidden px-4 py-3 text-xs text-dp-text3 sm:table-cell">{file.shared_by ?? "—"}</td>
+                    <td className="hidden px-4 py-3 text-sm text-dp-text3 sm:table-cell">{folder ? "—" : formatBytes(file.size)}</td>
+                    <td className="hidden px-4 py-3 md:table-cell">
                       <span className="rounded-md border border-dp-border px-2 py-0.5 text-xs text-dp-text3">#{file.account_index}</span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-dp-text3">
+                    <td className="hidden px-4 py-3 text-sm text-dp-text3 md:table-cell">
                       {file.created_at ? new Date(file.created_at).toLocaleDateString() : "—"}
                     </td>
                     <td className="px-4 py-3">

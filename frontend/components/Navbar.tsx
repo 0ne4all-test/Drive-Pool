@@ -6,7 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 
 type ProfileData = { display_name: string | null; bio: string | null };
 
-export default function Navbar() {
+export default function Navbar({ onMenuOpen }: { onMenuOpen?: () => void }) {
   const router = useRouter();
   const { theme, toggle } = useTheme();
   const [profile, setProfile] = useState<ProfileData>({ display_name: null, bio: null });
@@ -62,7 +62,20 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="flex h-12 flex-none items-center justify-end gap-1 border-b border-dp-border bg-dp-sidebar px-4">
+      <header className="flex h-12 flex-none items-center justify-between border-b border-dp-border bg-dp-sidebar px-4">
+        {/* Hamburger — mobile only */}
+        <button
+          onClick={onMenuOpen}
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-dp-text3 transition hover:bg-dp-hover hover:text-dp-text lg:hidden"
+          title="Open menu"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+
+        {/* Right-side controls */}
+        <div className="ml-auto flex items-center gap-1">
         <button
           onClick={toggle}
           className="flex h-8 w-8 items-center justify-center rounded-lg text-dp-text3 transition hover:bg-dp-hover hover:text-dp-text"
@@ -98,7 +111,7 @@ export default function Navbar() {
               onError={() => setAvatarLoaded(false)}
             />
           </div>
-          <span className="text-xs font-medium text-dp-text">{profile.display_name || "Profile"}</span>
+          <span className="hidden text-xs font-medium text-dp-text sm:inline">{profile.display_name || "Profile"}</span>
           <svg className="h-3 w-3 text-dp-text3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
           </svg>
@@ -113,6 +126,7 @@ export default function Navbar() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
           </svg>
         </button>
+        </div>
       </header>
 
       {showModal && (

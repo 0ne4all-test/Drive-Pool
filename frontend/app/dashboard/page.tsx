@@ -97,7 +97,7 @@ export default function OverviewPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-dp-text">Overview</h1>
           <p className="mt-1 text-sm text-dp-text2">Your unified cloud storage at a glance</p>

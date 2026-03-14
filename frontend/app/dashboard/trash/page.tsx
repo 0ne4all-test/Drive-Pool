@@ -170,7 +170,7 @@ export default function TrashPage() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-dp-text">Trash</h1>
           <p className="mt-1 text-sm text-dp-text2">
@@ -279,9 +279,9 @@ export default function TrashPage() {
             <thead>
               <tr className="border-b border-dp-border">
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Size</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Account</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Trashed</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3 sm:table-cell">Size</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3 md:table-cell">Account</th>
+                <th className="hidden px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3 md:table-cell">Trashed</th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-dp-text3">Actions</th>
               </tr>
             </thead>
@@ -296,11 +296,11 @@ export default function TrashPage() {
                         <span className="text-sm text-dp-text" title={file.file_name}>{file.file_name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-dp-text3">{formatBytes(file.size)}</td>
-                    <td className="px-4 py-3">
+                    <td className="hidden px-4 py-3 text-sm text-dp-text3 sm:table-cell">{formatBytes(file.size)}</td>
+                    <td className="hidden px-4 py-3 md:table-cell">
                       <span className="rounded-md border border-dp-border px-2 py-0.5 text-xs text-dp-text3">#{file.account_index}</span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-dp-text3">
+                    <td className="hidden px-4 py-3 text-sm text-dp-text3 md:table-cell">
                       {file.trashed_at ? new Date(file.trashed_at).toLocaleDateString() : "—"}
                     </td>
                     <td className="px-4 py-3">

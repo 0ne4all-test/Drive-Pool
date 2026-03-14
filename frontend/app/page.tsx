@@ -13,7 +13,7 @@ const features = [
     color: "text-orange-400",
     bg: "bg-orange-500/10",
     title: "Unified Storage Pool",
-    desc: "Combine unlimited Google Drive accounts into a single storage pool. Multiply your free 15 GB × N accounts.",
+    desc: "Combine unlimited Google Drive accounts into one dashboard. N accounts × 15 GB = effectively unlimited free cloud storage.",
   },
   {
     icon: (
@@ -24,7 +24,7 @@ const features = [
     color: "text-orange-400",
     bg: "bg-orange-500/10",
     title: "Smart Upload Routing",
-    desc: "Automatically routes uploads to the account with the most free space. Zero manual management.",
+    desc: "Least-Used-Space strategy automatically routes every upload to the account with the most free space. Zero manual management.",
   },
   {
     icon: (
@@ -35,7 +35,40 @@ const features = [
     color: "text-sky-400",
     bg: "bg-sky-500/10",
     title: "Folder Navigation",
-    desc: "Full folder hierarchy, breadcrumb navigation, grid & list views. Your files, organized as they are in Drive.",
+    desc: "Full folder hierarchy with breadcrumb bar, grid & list views, search, sort, and file type filters across all your accounts.",
+  },
+  {
+    icon: (
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883 2.542l.857 6a2.25 2.25 0 0 0 2.227 1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0 1 6 3.75h3.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 0 1.06.44H18A2.25 2.25 0 0 1 20.25 9v.776" />
+      </svg>
+    ),
+    color: "text-violet-400",
+    bg: "bg-violet-500/10",
+    title: "Drag-to-Folder Panel",
+    desc: "Start dragging any file and a panel slides in from the right showing every folder. Drop to move instantly — auto-scrolls for long lists.",
+  },
+  {
+    icon: (
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185z" />
+      </svg>
+    ),
+    color: "text-sky-400",
+    bg: "bg-sky-500/10",
+    title: "Shared with Me",
+    desc: "Browse and navigate into folders that others have shared with your Drive accounts. Download files directly from the shared view.",
+  },
+  {
+    icon: (
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+      </svg>
+    ),
+    color: "text-rose-400",
+    bg: "bg-rose-500/10",
+    title: "Trash Management",
+    desc: "Delete sends files to Drive trash — nothing is gone for good. Restore any file or permanently delete from the Trash page.",
   },
   {
     icon: (
@@ -46,7 +79,7 @@ const features = [
     color: "text-emerald-400",
     bg: "bg-emerald-500/10",
     title: "Secure Local Access",
-    desc: "PIN-protected dashboard. Runs entirely on your local machine — your data never leaves your network.",
+    desc: "PIN-protected with bcrypt hashing. Secrets live in the local database — no .env files, no cloud auth service, no telemetry.",
   },
   {
     icon: (
@@ -57,7 +90,7 @@ const features = [
     color: "text-orange-400",
     bg: "bg-orange-500/10",
     title: "Rich Analytics",
-    desc: "Storage breakdown charts, file type distribution, upload activity — all the stats you need at a glance.",
+    desc: "Storage breakdown per account, file type distribution, weekly upload activity, and per-type storage bars — all client-side.",
   },
   {
     icon: (
@@ -68,7 +101,7 @@ const features = [
     color: "text-pink-400",
     bg: "bg-pink-500/10",
     title: "Open Source",
-    desc: "100% free and open source. Self-hosted, privacy-first. Inspect the code, contribute, or fork it for your needs.",
+    desc: "100% free and open source. Self-hosted, privacy-first. Inspect every line, contribute improvements, or fork it for your needs.",
   },
 ];
 
@@ -93,7 +126,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-dp-bg text-dp-text">
       {/* ── Navbar ─────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 border-b border-dp-border bg-dp-bg/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-orange-500/20 bg-orange-500/10">
               <svg className="h-4 w-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -104,7 +137,7 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link href="/docs" className="text-xs text-dp-text2 transition hover:text-dp-text">
+            <Link href="/docs" className="hidden text-xs text-dp-text2 transition hover:text-dp-text sm:inline">
               Docs
             </Link>
             <button
@@ -123,7 +156,7 @@ export default function LandingPage() {
               )}
             </button>
             <a
-              href="https://github.com"
+              href="https://github.com/saimon4u/Drive-Pool"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 rounded-lg border border-dp-border px-3 py-1.5 text-xs text-dp-text2 transition hover:border-orange-500/40 hover:text-dp-text"
@@ -148,7 +181,7 @@ export default function LandingPage() {
         <div className="grid-bg absolute inset-0" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dp-bg" />
 
-        <div className="relative mx-auto max-w-6xl px-6 py-24 text-center md:py-32">
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 py-24 text-center md:py-32">
           {/* Badge */}
           <div className="animate-fade-up mb-6 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/5 px-4 py-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
@@ -163,7 +196,8 @@ export default function LandingPage() {
           <p className="animate-fade-up-d2 mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-dp-text2">
             DrivePool aggregates multiple Google Drive accounts into a single unified dashboard.
             Get up to <strong className="text-dp-text">N × 15 GB</strong> free cloud storage with
-            smart routing, folder navigation, and rich analytics — all self-hosted on your machine.
+            smart routing, drag-to-folder moves, trash management, shared files, and rich analytics —
+            all self-hosted on your machine.
           </p>
 
           <div className="animate-fade-up-d3 flex flex-wrap items-center justify-center gap-3">
@@ -177,7 +211,7 @@ export default function LandingPage() {
               Open Dashboard
             </Link>
             <a
-              href="https://github.com"
+              href="https://github.com/saimon4u/Drive-Pool"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-xl border border-dp-border bg-dp-s1 px-6 py-3 font-semibold text-dp-text transition hover:border-orange-500/40"
@@ -234,7 +268,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features ───────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-20">
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold text-dp-text md:text-4xl">
             Everything you need,{" "}
@@ -261,24 +295,101 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Get started / Docs CTA ─────────────────────────── */}
+      {/* ── Dashboard pages showcase ────────────────────────── */}
       <section className="border-t border-dp-border bg-dp-s1 py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold text-dp-text md:text-4xl">
+              Six dedicated views,{" "}
+              <span className="gradient-text">one coherent app</span>
+            </h2>
+            <p className="mt-4 text-dp-text2">
+              Every section of DrivePool is purpose-built — no bloat, no clutter.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                path: "/dashboard",
+                label: "Overview",
+                color: "text-orange-400",
+                bg: "bg-orange-500/10",
+                border: "border-orange-500/20",
+                desc: "Stats cards, per-account storage bars, file type breakdown, and recent files at a glance.",
+              },
+              {
+                path: "/dashboard/files",
+                label: "Files",
+                color: "text-sky-400",
+                bg: "bg-sky-500/10",
+                border: "border-sky-500/20",
+                desc: "Upload, browse, rename, move (via drag panel), download, and trash files across all accounts.",
+              },
+              {
+                path: "/dashboard/shared",
+                label: "Shared with Me",
+                color: "text-violet-400",
+                bg: "bg-violet-500/10",
+                border: "border-violet-500/20",
+                desc: "Browse files and folders that other people have shared with your Drive accounts.",
+              },
+              {
+                path: "/dashboard/trash",
+                label: "Trash",
+                color: "text-rose-400",
+                bg: "bg-rose-500/10",
+                border: "border-rose-500/20",
+                desc: "See all trashed files, restore them to Drive, or permanently delete them.",
+              },
+              {
+                path: "/dashboard/stats",
+                label: "Analytics",
+                color: "text-emerald-400",
+                bg: "bg-emerald-500/10",
+                border: "border-emerald-500/20",
+                desc: "Weekly upload activity, storage by account, file type distribution, and per-type bars.",
+              },
+              {
+                path: "/dashboard/settings",
+                label: "Settings",
+                color: "text-amber-400",
+                bg: "bg-amber-500/10",
+                border: "border-amber-500/20",
+                desc: "Connect or disconnect Drive accounts, view quotas, and manage your profile.",
+              },
+            ].map((page) => (
+              <div
+                key={page.path}
+                className={`rounded-2xl border ${page.border} bg-dp-bg p-5 transition hover:bg-dp-hover`}
+              >
+                <div className={`mb-3 inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold ${page.color} ${page.bg}`}>
+                  {page.label}
+                </div>
+                <p className="text-sm leading-relaxed text-dp-text2">{page.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Get started / Docs CTA ─────────────────────────── */}
+      <section className="py-20">
         <div className="mx-auto max-w-4xl px-6">
           <div className="mb-10 text-center">
             <h2 className="text-3xl font-bold text-dp-text md:text-4xl">Get started in minutes</h2>
             <p className="mt-4 text-dp-text2">
-              Our step-by-step guide walks you from forking the repo to a fully working storage pool.
+              Our step-by-step guide walks you from cloning the repo to a fully working storage pool.
             </p>
           </div>
 
           {/* Quick overview chips */}
           <div className="mb-10 grid gap-3 sm:grid-cols-3">
             {[
-              { n: "01", label: "Create Google Cloud credentials", color: "text-orange-400", bg: "bg-orange-500/10" },
-              { n: "02", label: "Configure .env and start servers", color: "text-emerald-400", bg: "bg-emerald-500/10" },
-              { n: "03", label: "Connect accounts via OAuth", color: "text-blue-400", bg: "bg-blue-500/10" },
+              { n: "01", label: "Create Google Cloud credentials for each account", color: "text-orange-400", bg: "bg-orange-500/10" },
+              { n: "02", label: "Run generate_secrets.py — secrets saved to local DB", color: "text-emerald-400", bg: "bg-emerald-500/10" },
+              { n: "03", label: "Start both servers and connect accounts via OAuth", color: "text-blue-400", bg: "bg-blue-500/10" },
             ].map((step) => (
-              <div key={step.n} className="flex items-center gap-3 rounded-xl border border-dp-border bg-dp-bg p-4">
+              <div key={step.n} className="flex items-center gap-3 rounded-xl border border-dp-border bg-dp-s1 p-4">
                 <span className={`flex-shrink-0 text-xs font-bold ${step.color} ${step.bg} rounded-lg px-2 py-1`}>{step.n}</span>
                 <span className="text-sm text-dp-text2">{step.label}</span>
               </div>
@@ -301,7 +412,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Open Source CTA ────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-6 py-20 text-center">
+      <section className="mx-auto max-w-6xl px-4 sm:px-6 py-20 text-center">
         <div className="relative overflow-hidden rounded-3xl border border-orange-500/20 bg-orange-500/5 p-12">
           <div className="absolute inset-0 grid-bg opacity-30" />
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-orange-500/5 blur-3xl" />
@@ -323,7 +434,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a
-                href="https://github.com"
+                href="https://github.com/saimon4u/Drive-Pool"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 rounded-xl border border-orange-500/30 bg-orange-500/10 px-6 py-3 font-semibold text-orange-400 transition hover:bg-orange-500/20"
