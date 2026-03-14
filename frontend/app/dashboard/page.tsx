@@ -37,6 +37,29 @@ function StatCard({ label, value, sub, icon, iconBg }: StatCardProps) {
   );
 }
 
+function StorageCard({ used, free, iconBg }: { used: string; free: string; iconBg: string }) {
+  return (
+    <div className="rounded-xl border border-dp-border bg-dp-s1 p-5">
+      <div className={`mb-4 inline-flex rounded-lg p-2.5 ${iconBg}`}>
+        <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 2.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+        </svg>
+      </div>
+      <div className="flex items-end justify-between gap-2">
+        <div>
+          <div className="text-2xl font-semibold text-dp-text">{used}</div>
+          <div className="mt-0.5 text-xs text-dp-text3">used</div>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-semibold text-emerald-400">{free}</div>
+          <div className="mt-0.5 text-xs text-dp-text3">free</div>
+        </div>
+      </div>
+      <div className="mt-2 text-sm text-dp-text2">Storage</div>
+    </div>
+  );
+}
+
 function FileTypeIcon({ mimeType }: { mimeType: string | null }) {
   const t = mimeType ?? "";
   let bg = "bg-dp-hover";
@@ -126,25 +149,19 @@ export default function OverviewPage() {
             </svg>
           }
         />
-        <StatCard
-          label="Storage Used"
-          value={formatBytes(totalUsed)}
-          sub={`${((totalUsed / (totalLimit || 1)) * 100).toFixed(1)}% of total`}
+        <StorageCard
+          used={formatBytes(totalUsed)}
+          free={formatBytes(totalFree)}
           iconBg="bg-blue-500/10"
-          icon={
-            <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 2.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
-            </svg>
-          }
         />
         <StatCard
-          label="Free Space"
-          value={formatBytes(totalFree)}
-          sub={`across ${connectedCount} accounts`}
-          iconBg="bg-emerald-500/10"
+          label="Total Storage"
+          value={formatBytes(totalLimit)}
+          sub={`${connectedCount} account${connectedCount !== 1 ? "s" : ""} · ${((totalUsed / (totalLimit || 1)) * 100).toFixed(1)}% used`}
+          iconBg="bg-violet-500/10"
           icon={
-            <svg className="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+            <svg className="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
             </svg>
           }
         />

@@ -246,7 +246,7 @@ cd Drive-Pool`}
                   <>Go to <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" className="text-orange-400 underline underline-offset-2">console.cloud.google.com</a> and create a <strong className="text-dp-text">new project</strong>.</>,
                   <>Navigate to <strong className="text-dp-text">APIs &amp; Services → Library</strong>, search for <strong className="text-dp-text">Google Drive API</strong>, and enable it.</>,
                   <>Go to <strong className="text-dp-text">APIs &amp; Services → OAuth consent screen</strong>. Choose <strong className="text-dp-text">External</strong>, fill in any app name, and add <strong className="text-dp-text">all Google accounts you want to connect</strong> as test users (one email per line).</>,
-                  <>Go to <strong className="text-dp-text">Credentials → Create Credentials → OAuth client ID</strong>. Choose <strong className="text-dp-text">Desktop app</strong> as the application type.</>,
+                  <>Go to <strong className="text-dp-text">Credentials → Create Credentials → OAuth client ID</strong>. Choose <strong className="text-dp-text">Web application</strong> as the application type. Under <strong className="text-dp-text">Authorized redirect URIs</strong>, add <Code>http://localhost:8000/api/auth/callback</Code>.</>,
                   <>Download the JSON file. You&apos;ll place it in the next step.</>,
                 ]} />
                 <Note type="tip">
